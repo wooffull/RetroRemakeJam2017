@@ -1,0 +1,145 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerMovement : MonoBehaviour
+{
+    public float jumpHeight = 3 * 1.28f;
+    public float totalJumpTime = 1.0f;
+    public float walkSpeed = 3 * 1.28f;
+
+    private Rigidbody2D rigidBody;
+
+    private bool canJump = false;
+    private float jumpTimer = 0;
+    private bool isGrounded = false;
+    private Vector2 displacement;
+    private HashSet<GameObject> collidedGroundObjects;
+
+    // Use this for initialization
+    void Start () {
+        rigidBody = gameObject.GetComponent<Rigidbody2D>();
+
+        collidedGroundObjects = new HashSet<GameObject>();
+    }
+
+    void OnCollisionEnter2D(Collision2D c)
+    {
+        OnCollisionStay2D(c);
+    }
+
+    void OnCollisionStay2D(Collision2D c)
+    {
+        if (c.contacts.Length > 0)
+        {
+            ContactPoint2D contact = c.contacts[0];
+
+            // If the collision was below the player, the player is grounded
+            if (Vector3.Dot(contact.normal, Vector2.up) > 0.5f)
+            {
+                ResetJump();
+                isGrounded = true;
+                collidedGroundObjects.Add(c.gameObject);
+            }
+
+            // If player hits its head, end the jump
+            else if (Vector3.Dot(contact.normal, Vector2.up) < -0.5f)
+            {
+                jumpTimer = totalJumpTime;
+                canJump = false;
+            }
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D c)
+    {
+        collidedGroundObjects.Remove(c.gameObject);
+
+        // If there are no game objects directly under the player, it's no longer grounded
+        if (collidedGroundObjects.Count == 0)
+        {
+            isGrounded = false;
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        // Reset movement for this tick
+        displacement = Vector2.zero;
+
+        UpdateMovement();
+        UpdateJump();
+        
+        rigidBody.position += new Vector2(displacement.x, displacement.y);
+    }
+
+    private void UpdateMovement()
+    {
+        float walkDirection = Input.GetAxis("Horizontal");
+
+        // Add movement from walking around
+        displacement.x += walkDirection * walkSpeed * Time.deltaTime;
+    }
+
+    private void UpdateJump()
+    {
+        bool jumpKeyDown = Input.GetButton("Jump");
+        float prevJumpTimer = jumpTimer;
+        float deltaTimeSinceLastJump = Time.deltaTime;
+
+        // If no jump key is down, or the jump has finished, the player can no longer jump
+        if (!jumpKeyDown || jumpTimer >= totalJumpTime)
+        {
+            canJump = false;
+        }
+
+        // Otherwise, if the player can jump, jump!
+        else if (canJump)
+        {
+            if (jumpTimer < totalJumpTime)
+            {
+                jumpTimer += deltaTimeSinceLastJump;
+
+                // Do not allow the jump timer to exceed the total time allow for holding a jump
+                if (jumpTimer > totalJumpTime)
+                {
+                    deltaTimeSinceLastJump = jumpTimer - totalJumpTime;
+                    jumpTimer = totalJumpTime;
+                }
+            }
+        }
+
+        // If the player is jumping, prepare to move this game object up in space
+        if (canJump && jumpTimer > 0)
+        {
+            displacement += Vector2.up * CalculateJumpIncrement(prevJumpTimer, jumpTimer);
+
+            // Undo the gravity that was applied since the jump calculation will already be parabolic
+            Vector2 currentFrameGravity = Physics2D.gravity * (jumpTimer - prevJumpTimer) * rigidBody.mass;
+            rigidBody.AddForce(-currentFrameGravity, ForceMode2D.Impulse);
+        }
+
+        // Reset jump variables if grounded and can jump
+        if (isGrounded && !canJump)
+        {
+            ResetJump();
+        }
+    }
+
+    /**
+     * Returns the distance the player should rise from t0 seconds to t1 seconds in the jump cycle to abide by a parabolic motion
+     */
+    private float CalculateJumpIncrement(float t0, float t1)
+    {
+        float offset0 = t0 - totalJumpTime;
+        float offset1 = t1 - totalJumpTime;
+        return (jumpHeight / (totalJumpTime * totalJumpTime * totalJumpTime)) * (offset1 * offset1 * offset1 - offset0 * offset0 * offset0);
+    }
+
+    private void ResetJump()
+    {
+        jumpTimer = 0;
+        canJump = true;
+    }
+}
