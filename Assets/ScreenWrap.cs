@@ -6,9 +6,8 @@ using UnityEngine;
  * https://gamedevelopment.tutsplus.com/articles/create-an-asteroids-like-screen-wrapping-effect-with-unity--gamedev-15055
  */
 public class ScreenWrap : MonoBehaviour {
-
-    private Rigidbody2D rigidBody;
-    private Camera camera;
+    
+    private new Camera camera;
     private Vector3 viewportBottomLeft;
     private Vector3 viewportTopRight;
     private float screenWidth;
@@ -17,7 +16,6 @@ public class ScreenWrap : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        rigidBody = gameObject.GetComponent<Rigidbody2D>();
         camera = Camera.main;
         viewportBottomLeft = camera.ViewportToWorldPoint(new Vector3(0, 0, transform.position.z));
         viewportTopRight = camera.ViewportToWorldPoint(new Vector3(1, 1, transform.position.z));
