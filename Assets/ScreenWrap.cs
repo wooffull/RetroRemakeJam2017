@@ -57,7 +57,7 @@ public class ScreenWrap : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        foreach(GameObject ghost in ghostPlayers)
+        foreach (GameObject ghost in ghostPlayers)
         {
             if (ghost.transform.position.x < screenWidth * 0.5f && ghost.transform.position.x > -screenWidth * 0.5f)
             {
