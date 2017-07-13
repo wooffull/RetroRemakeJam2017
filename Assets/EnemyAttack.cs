@@ -24,13 +24,12 @@ public class EnemyAttack : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        /*
         // Damages the player and causes the player to turn invincible
 		if(playerCollider.IsTouching(enemyCollider) && playerInvincibility.isInvincible == false)
         {
             playerStats.health -= enemyStats.damage;
             playerInvincibility.MakeInvincible();
         }
-        Debug.Log(playerStats.health);*/
+        Debug.Log(playerStats.health);
 	}
 }

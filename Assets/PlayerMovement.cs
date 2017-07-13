@@ -8,12 +8,17 @@ public class PlayerMovement : MonoBehaviour
     public float totalJumpTime = 1.0f;
     public float walkSpeed = 3 * 1.28f;
 
+    public bool isCrouch = false;
+    public bool isUp = false;
+    public Vector2 displacement;
+
     private Rigidbody2D rigidBody;
+    private CapsuleCollider2D capsuleCollider;
 
     private bool canJump = false;
-    private float jumpTimer = 0;
     private bool isGrounded = false;
-    private Vector2 displacement;
+    //private bool canMove = true;
+    private float jumpTimer = 0;
     private HashSet<GameObject> collidedGroundObjects;
 
     // Use this for initialization
@@ -21,6 +26,8 @@ public class PlayerMovement : MonoBehaviour
         rigidBody = gameObject.GetComponent<Rigidbody2D>();
 
         collidedGroundObjects = new HashSet<GameObject>();
+
+        capsuleCollider = gameObject.GetComponent<CapsuleCollider2D>();
     }
 
     void OnCollisionEnter2D(Collision2D c)
@@ -65,6 +72,34 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float verticalInput = Input.GetAxis("Vertical");
+
+        // Pit crouches
+        if (verticalInput < 0)
+        {
+            isCrouch = true;
+            isUp = false;
+            capsuleCollider.size = new Vector2(1, 1.92f * (2f / 3f));
+            capsuleCollider.offset = new Vector2(0, 0.95f * (2f / 3f));
+            //canMove = true;
+        }
+        else if (verticalInput > 0) // Pit aims upward
+        {
+            isCrouch = false;
+            isUp = true;
+            capsuleCollider.size = new Vector2(1, 1.92f);
+            capsuleCollider.offset = new Vector2(0, 0.95f);
+            //canMove = false;
+        }
+        else // Pit is standing/jumping/falling
+        {
+            isCrouch = false;
+            isUp = false;
+            capsuleCollider.size = new Vector2(1, 1.92f);
+            capsuleCollider.offset = new Vector2(0, 0.95f);
+            //canMove = true;
+        }
+
         // Reset movement for this tick
         displacement = Vector2.zero;
 
