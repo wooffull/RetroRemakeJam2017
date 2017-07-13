@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemyAttack : MonoBehaviour {
 
-    private GameObject player = GameObject.Find("Player");
+    private GameObject player;
     private Collider2D playerCollider;
     private Collider2D enemyCollider;
     private Stats playerStats;
@@ -13,6 +13,7 @@ public class EnemyAttack : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        player = GameObject.Find("Player");
         playerCollider = player.GetComponent<Collider2D>();
         enemyCollider = gameObject.GetComponent<Collider2D>();
         playerStats = player.GetComponent<Stats>();
@@ -23,12 +24,13 @@ public class EnemyAttack : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+        /*
         // Damages the player and causes the player to turn invincible
 		if(playerCollider.IsTouching(enemyCollider) && playerInvincibility.isInvincible == false)
         {
             playerStats.health -= enemyStats.damage;
             playerInvincibility.MakeInvincible();
         }
-        Debug.Log(playerStats.health);
+        Debug.Log(playerStats.health);*/
 	}
 }

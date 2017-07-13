@@ -7,13 +7,14 @@ public class VerticalInput : MonoBehaviour {
     public bool isCrouch = false;
     public bool isUp = false;
 
-    private GameObject player = GameObject.Find("Player");
+    private GameObject player;
     private Rigidbody2D rigidBody;
 
     // Use this for initialization
     void Start()
     {
-        rigidBody = player.GetComponent<Rigidbody2D>();
+        player = GameObject.Find("Player");
+        //rigidBody = player.GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame

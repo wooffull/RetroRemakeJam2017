@@ -12,8 +12,7 @@ public class ScreenWrap : MonoBehaviour {
     private Vector3 viewportBottomLeft;
     private Vector3 viewportTopRight;
     private float screenWidth;
-    private float screenHeight;
-    private Transform[] ghostPlayers;
+    private GameObject[] ghostPlayers;
     private Vector3 ghostPosition;
 
 	// Use this for initialization
@@ -23,11 +22,11 @@ public class ScreenWrap : MonoBehaviour {
         viewportBottomLeft = camera.ViewportToWorldPoint(new Vector3(0, 0, transform.position.z));
         viewportTopRight = camera.ViewportToWorldPoint(new Vector3(1, 1, transform.position.z));
         screenWidth = viewportTopRight.x - viewportBottomLeft.x;
-        screenHeight = viewportTopRight.y - viewportBottomLeft.y;
-        ghostPlayers = new Transform[2];
+        ghostPlayers = new GameObject[2];
         ghostPosition = transform.position;
 
-        //CreateGhostPlayers(); - Causes crashes currently
+        CreateGhostPlayers();
+        PositionGhostPlayers();
     }
 
     // Method for creating ghost player sprites
@@ -36,9 +35,9 @@ public class ScreenWrap : MonoBehaviour {
         /// No idea what the hell any of this does
         for(int i = 0; i < 2; i++)
         {
-            ghostPlayers[i] = Instantiate(transform, Vector3.zero, Quaternion.identity) as Transform;
-
-            //DestroyImmediate(ghostPlayers[i].GetComponent());
+            ghostPlayers[i] = Instantiate(new GameObject(), Vector3.zero, Quaternion.identity) as GameObject;
+            SpriteRenderer sr = ghostPlayers[i].AddComponent<SpriteRenderer>();
+            sr.sprite = gameObject.GetComponent<SpriteRenderer>().sprite;
         }
     }
 
@@ -48,22 +47,21 @@ public class ScreenWrap : MonoBehaviour {
         // Right side
         ghostPosition.x = transform.position.x + screenWidth;
         ghostPosition.y = transform.position.y;
-        ghostPlayers[0].position = ghostPosition;
+        ghostPlayers[0].transform.position = ghostPosition;
 
         // Left side
         ghostPosition.x = transform.position.x - screenWidth;
         ghostPosition.y = transform.position.y;
-        ghostPlayers[1].position = ghostPosition;
+        ghostPlayers[1].transform.position = ghostPosition;
     }
 	
 	// Update is called once per frame
 	void Update () {
-        foreach(Transform ghost in ghostPlayers)
+        foreach(GameObject ghost in ghostPlayers)
         {
-            if (ghost.position.x < screenWidth && ghost.position.x > -screenWidth &&
-            ghost.position.y < screenHeight && ghost.position.y > -screenHeight)
+            if (ghost.transform.position.x < screenWidth * 0.5f && ghost.transform.position.x > -screenWidth * 0.5f)
             {
-                transform.position = ghost.position;
+                transform.position = ghost.transform.position;
 
                 break;
             }

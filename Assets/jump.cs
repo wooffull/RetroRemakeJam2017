@@ -20,6 +20,7 @@ public class Jump : MonoBehaviour {
     bool IsGrounded()
     {
         RaycastHit2D hit = Physics2D.Raycast(gameObject.transform.position, -Vector2.up);
+        Debug.Log(hit);
 
         if(hit.collider != null)
         {
