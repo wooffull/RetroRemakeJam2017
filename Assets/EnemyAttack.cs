@@ -10,16 +10,18 @@ public class EnemyAttack : MonoBehaviour {
     private Stats playerStats;
     private Stats enemyStats;
     private Invincibility playerInvincibility;
+    private AudioManager audioManager;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         player = GameObject.Find("Player");
         playerCollider = player.GetComponent<Collider2D>();
         enemyCollider = gameObject.GetComponent<Collider2D>();
         playerStats = player.GetComponent<Stats>();
         enemyStats = gameObject.GetComponent<Stats>();
         playerInvincibility = player.GetComponent<Invincibility>();
-	}
+        audioManager = GameObject.Find("Audio").GetComponent<AudioManager>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -29,6 +31,8 @@ public class EnemyAttack : MonoBehaviour {
         {
             playerStats.health -= enemyStats.damage;
             playerInvincibility.MakeInvincible();
+
+            audioManager.PlayTakeDamageSound();
         }
         Debug.Log(playerStats.health);
 	}

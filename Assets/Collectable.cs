@@ -9,17 +9,24 @@ public class Collectable : MonoBehaviour {
 
     private GameObject player;
     private Stats playerStats;
+    private AudioManager audioManager;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         player = GameObject.FindGameObjectWithTag("Player");
         playerStats = player.GetComponent<Stats>();
-	}
+        audioManager = GameObject.Find("Audio").GetComponent<AudioManager>();
+    }
 
     void OnTriggerEnter2D(Collider2D c)
     {
         if (c.gameObject == player)
         {
+            if (healthIncrease > 0)
+            {
+                audioManager.PlayHealSound();
+            }
+
             playerStats.Collect(this);
             Destroy(gameObject);
         }
