@@ -5,9 +5,15 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     public AudioClip healSfx;
+    public AudioClip collectMoneySfx;
+    public AudioClip denySfx;
     public AudioClip takeDamageSfx;
 
+    public float denySfxThrottleTime = 0.25f;
+
     public static AudioManager instance = null;
+
+    private float lastDenySfxStartTime = -1000;
 
     void Awake()
     {
@@ -29,15 +35,32 @@ public class AudioManager : MonoBehaviour
 
     public void PlayHealSound()
     {
-        AudioSource a = gameObject.AddComponent<AudioSource>();
-        a.clip = healSfx;
-        a.Play();
+        Play(healSfx);
     }
 
     public void PlayTakeDamageSound()
     {
+        Play(takeDamageSfx);
+    }
+
+    public void PlayMoneySound()
+    {
+        Play(collectMoneySfx);
+    }
+
+    public void PlayDenySound()
+    {
+        if (Time.time - lastDenySfxStartTime >= denySfxThrottleTime)
+        {
+            lastDenySfxStartTime = Time.time;
+            Play(denySfx);
+        }
+    }
+
+    private void Play(AudioClip audioClip)
+    {
         AudioSource a = gameObject.AddComponent<AudioSource>();
-        a.clip = takeDamageSfx;
+        a.clip = audioClip;
         a.Play();
     }
 }

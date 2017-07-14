@@ -14,21 +14,21 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 displacement;
 
     private Rigidbody2D rigidBody;
-    private CapsuleCollider2D capsuleCollider;
+    private BoxCollider2D collider;
 
     private bool canJump = false;
     private bool isGrounded = false;
     //private bool canMove = true;
     private float jumpTimer = 0;
     private HashSet<GameObject> collidedGroundObjects;
+    private AudioManager audioManager;
 
     // Use this for initialization
     void Start () {
         rigidBody = gameObject.GetComponent<Rigidbody2D>();
-
+        collider = gameObject.GetComponent<BoxCollider2D>();
         collidedGroundObjects = new HashSet<GameObject>();
-
-        capsuleCollider = gameObject.GetComponent<CapsuleCollider2D>();
+        audioManager = GameObject.Find("Audio").GetComponent<AudioManager>();
     }
 
     void OnCollisionEnter2D(Collision2D c)
@@ -43,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
             ContactPoint2D contact = c.contacts[0];
 
             // If the collision was below the player, the player is grounded
-            if (Vector3.Dot(contact.normal, Vector2.up) > 0.5f)
+            if (Vector3.Dot(contact.normal, Vector2.up) > 0.75f)
             {
                 ResetJump();
                 isGrounded = true;
@@ -51,8 +51,13 @@ public class PlayerMovement : MonoBehaviour
             }
 
             // If player hits its head, end the jump
-            else if (Vector3.Dot(contact.normal, Vector2.up) < -0.5f)
+            else if (Vector3.Dot(contact.normal, Vector2.up) < -0.75f)
             {
+                if (canJump)
+                {
+                    audioManager.PlayDenySound();
+                }
+
                 jumpTimer = totalJumpTime;
                 canJump = false;
             }
@@ -80,24 +85,24 @@ public class PlayerMovement : MonoBehaviour
         {
             isCrouch = true;
             isUp = false;
-            capsuleCollider.size = new Vector2(1, 1.92f * (2f / 3f));
-            capsuleCollider.offset = new Vector2(0, 0.95f * (2f / 3f));
+            collider.size = new Vector2(1, 1.92f * (2f / 3f));
+            collider.offset = new Vector2(0, 0.95f * (2f / 3f));
             //canMove = true;
         }
         else if (verticalInput > 0) // Pit aims upward
         {
             isCrouch = false;
             isUp = true;
-            capsuleCollider.size = new Vector2(1, 1.92f);
-            capsuleCollider.offset = new Vector2(0, 0.95f);
+            collider.size = new Vector2(1, 1.92f);
+            collider.offset = new Vector2(0, 0.95f);
             //canMove = false;
         }
         else // Pit is standing/jumping/falling
         {
             isCrouch = false;
             isUp = false;
-            capsuleCollider.size = new Vector2(1, 1.92f);
-            capsuleCollider.offset = new Vector2(0, 0.95f);
+            collider.size = new Vector2(1, 1.92f);
+            collider.offset = new Vector2(0, 0.95f);
             //canMove = true;
         }
 
@@ -108,7 +113,6 @@ public class PlayerMovement : MonoBehaviour
         UpdateJump();
 
         rigidBody.position += new Vector2(displacement.x, displacement.y);
-        rigidBody.AddForce(displacement);
     }
 
     private void UpdateMovement()

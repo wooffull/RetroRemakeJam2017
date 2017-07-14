@@ -38,6 +38,10 @@ public class Collectable : MonoBehaviour {
             {
                 audioManager.PlayHealSound();
             }
+            else if (moneyIncrease > 0)
+            {
+                audioManager.PlayMoneySound();
+            }
 
             playerStats.Collect(this);
             Destroy(gameObject);
