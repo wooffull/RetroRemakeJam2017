@@ -69,6 +69,11 @@ public class Stats : MonoBehaviour {
                 transform.position += Vector3.down * 0.1f;
             }
         }
+        else if(health <= 0) // If it is not the player, the enemy dies
+        {
+            Destroy(gameObject);
+            // Add code to drop hearts
+        }
 	}
 
     public void Collect(Collectable c)

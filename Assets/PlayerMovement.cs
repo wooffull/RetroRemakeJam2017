@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
 
     public bool isCrouch = false;
     public bool isUp = false;
+    public bool isLeft = false;
     public Vector2 displacement;
 
     private Rigidbody2D rigidBody;
@@ -112,6 +113,16 @@ public class PlayerMovement : MonoBehaviour
     private void UpdateMovement()
     {
         float walkDirection = Input.GetAxis("Horizontal");
+
+        // Determines the direction the player is facing
+        if(walkDirection < 0)
+        {
+            isLeft = true;
+        }
+        else if(walkDirection > 0)
+        {
+            isLeft = false;
+        }
 
         // Add movement from walking around
         displacement.x += walkDirection * walkSpeed * Time.deltaTime;

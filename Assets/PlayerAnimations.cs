@@ -17,9 +17,30 @@ public class PlayerAnimations : MonoBehaviour {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         playerMovement = gameObject.GetComponent<PlayerMovement>();
     }
+
+    // Method for making the sprites face left
+    void LeftSprites()
+    {
+        transform.localScale = new Vector3(-1, 1, 1);
+    }
+
+    // Method for making hte sprites face right
+    void RightSprites()
+    {
+        transform.localScale = new Vector3(1, 1, 1);
+    }
 	
 	// Update is called once per frame
 	void Update () {
+        // Determines direction the sprites will face
+        if(playerMovement.isLeft)
+        {
+            LeftSprites();
+        }
+        else
+        {
+            RightSprites();
+        }
 
 		if(playerMovement.isCrouch) // Pit is crouching
         {
