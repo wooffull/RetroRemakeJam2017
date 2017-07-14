@@ -14,9 +14,7 @@ public class ScreenWrap : MonoBehaviour {
     private GameObject[] ghostPlayers;
     private Vector3 ghostPosition;
     private SpriteRenderer sr;
-    private GameObject player;
     private Sprite currentSprite;
-    private PlayerMovement playerMovement;
 
 	// Use this for initialization
 	void Start () {
@@ -26,20 +24,25 @@ public class ScreenWrap : MonoBehaviour {
         screenWidth = viewportTopRight.x - viewportBottomLeft.x;
         ghostPlayers = new GameObject[2];
         ghostPosition = transform.position;
-        player = GameObject.Find("Player");
-        playerMovement = player.GetComponent<PlayerMovement>();
 
         CreateGhostPlayers();
         PositionGhostPlayers();
     }
 
+    void OnDestroy()
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            Destroy(ghostPlayers[i]);
+        }
+    }
+
     // Method for creating ghost player sprites
     void CreateGhostPlayers()
     {
-        /// No idea what the hell any of this does
         for(int i = 0; i < 2; i++)
         {
-            ghostPlayers[i] = Instantiate(new GameObject(), Vector3.zero, Quaternion.identity) as GameObject;
+            ghostPlayers[i] = new GameObject();
             sr = ghostPlayers[i].AddComponent<SpriteRenderer>();
             sr.sprite = gameObject.GetComponent<SpriteRenderer>().sprite;
         }
@@ -55,14 +58,7 @@ public class ScreenWrap : MonoBehaviour {
             sr = ghostPlayers[i].GetComponent<SpriteRenderer>();
             sr.sprite = currentSprite;
 
-            if(playerMovement.isLeft)
-            {
-                ghostPlayers[i].transform.localScale = new Vector3(-1, 1, 1);
-            }
-            else
-            {
-                ghostPlayers[i].transform.localScale = new Vector3(1, 1, 1);
-            }
+            ghostPlayers[i].transform.localScale = gameObject.transform.localScale;
         }
     }
 

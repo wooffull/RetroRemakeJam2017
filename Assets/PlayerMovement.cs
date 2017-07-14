@@ -106,8 +106,9 @@ public class PlayerMovement : MonoBehaviour
 
         UpdateMovement();
         UpdateJump();
-        
+
         rigidBody.position += new Vector2(displacement.x, displacement.y);
+        rigidBody.AddForce(displacement);
     }
 
     private void UpdateMovement()

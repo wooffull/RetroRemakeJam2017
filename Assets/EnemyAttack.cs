@@ -34,6 +34,5 @@ public class EnemyAttack : MonoBehaviour {
 
             audioManager.PlayTakeDamageSound();
         }
-        Debug.Log(playerStats.health);
 	}
 }
