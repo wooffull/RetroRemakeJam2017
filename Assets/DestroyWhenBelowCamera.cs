@@ -11,7 +11,7 @@ public class DestroyWhenBelowCamera : MonoBehaviour
 
     private new Camera camera;
     private new Collider2D collider;
-    private Vector3 viewportBottomLeft;
+	private Vector3 viewportBottomLeft;
     private Vector3 viewportTopRight;
 
     // Use this for initialization
@@ -19,17 +19,21 @@ public class DestroyWhenBelowCamera : MonoBehaviour
     {
         camera = Camera.main;
         viewportBottomLeft = camera.ViewportToWorldPoint(new Vector3(0, 0, transform.position.z));
-        viewportTopRight = camera.ViewportToWorldPoint(new Vector3(1, 1, transform.position.z));
+        // viewportTopRight = camera.ViewportToWorldPoint(new Vector3(1, 1, transform.position.z));
         collider = GetComponent<Collider2D>();
-    }
+	    }
 	
 	// Update is called once per frame
 	void Update () {
-        if (collider.bounds.max.y < camera.transform.position.y + viewportBottomLeft.y - bottomOffset)
+		
+		viewportBottomLeft = camera.ViewportToWorldPoint(new Vector3(0, 0, transform.position.z));
+		// viewportTopRight = camera.ViewportToWorldPoint(new Vector3(1, 1, transform.position.z));
+
+		if (collider.bounds.max.y < viewportBottomLeft.y - bottomOffset)
         {
             Destroy(gameObject);
 
-            if (gameObject.tag == "Player")
+			if (gameObject.tag == "Player")
             {
                 SceneManager.LoadScene("GameScene");
             }

@@ -59,6 +59,7 @@ public class Stats : MonoBehaviour {
     {
         collectible = Instantiate(moneyPrefab, Vector3.zero, Quaternion.identity) as GameObject;
         collectible.transform.position = gameObject.transform.position;
+        collectible.name = "Money_" + gameObject.name;
     }
 
     // Method for spawning health
