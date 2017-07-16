@@ -13,8 +13,9 @@ public class MonoeyeAI : MonoBehaviour {
 	private Rigidbody2D body;
 	private float viewportLeft;
 	private float viewportRight;
-	private float viewportLeftInner;
-	private float viewportRightInner;
+	private float xTarget;
+	private float xTargetLeft;
+	private float xTargetRight;
 	private float viewportMax;
 	private float viewportMin;
 	private GameObject player;
@@ -24,9 +25,17 @@ public class MonoeyeAI : MonoBehaviour {
 	private float xMax;
 	private float xMin;
 	private float yVelMax;
+	private float xVelMax;
 	private float yTargetForce;
+	private float xTargetForce;
 	private float yAccMax;
 	private float yAccMin;
+	private float xAccMax;
+	private float xAccMin;
+	private float yTargetTop;
+	private float yTargetBot;
+	private bool enteredScreen;
+	private float viewportTop;
 	// Use this for initialization
 	void Start () {
 		player = GameObject.Find ("Player");
@@ -34,22 +43,38 @@ public class MonoeyeAI : MonoBehaviour {
 		collid = gameObject.GetComponent<Collider2D> ();
 		timesFlipped = 0;
 		camera = Camera.main;
-		yTarget = camera.ViewportToWorldPoint(new Vector3(0, 0.8f, transform.position.z)).y;
+		viewportTop = camera.ViewportToWorldPoint(new Vector3(0, 1f, transform.position.z)).y;
+		yTargetTop = camera.ViewportToWorldPoint(new Vector3(0, 0.85f, transform.position.z)).y;
+		yTargetBot = camera.ViewportToWorldPoint(new Vector3(0, 0.75f, transform.position.z)).y;
 		viewportMin = camera.ViewportToWorldPoint (new Vector3 (0, 0, transform.position.z)).x;
 		viewportMax = camera.ViewportToWorldPoint (new Vector3 (1f, 0, transform.position.z)).x;
-		viewportLeft = camera.ViewportToWorldPoint (new Vector3 (0.1f, 0, transform.position.z)).x;
-		viewportRight = camera.ViewportToWorldPoint (new Vector3 (0.9f, 0, transform.position.z)).x;
-		viewportLeftInner = camera.ViewportToWorldPoint (new Vector3 (0.3f, 0, transform.position.z)).x;
-		viewportRightInner = camera.ViewportToWorldPoint (new Vector3 (0.7f, 0, transform.position.z)).x;
-		yAccMax = 10f;
-		yAccMin = 0.5f;
-		yVelMax = 1.0f;
+		viewportLeft = camera.ViewportToWorldPoint (new Vector3 (0.01f, 0, transform.position.z)).x;
+		viewportRight = camera.ViewportToWorldPoint (new Vector3 (0.99f, 0, transform.position.z)).x;
+		xTargetLeft = camera.ViewportToWorldPoint (new Vector3 (0.15f, 0, transform.position.z)).x;
+		xTargetRight = camera.ViewportToWorldPoint (new Vector3 (0.85f, 0, transform.position.z)).x;
+//		xTargetLeft = viewportLeft;
+//		xTargetRight = viewportRight;
+		yAccMax = 3f;
+		yAccMin = 1f;
+		yVelMax = 0.1f;
+		yTarget = yTargetBot;
+
+		xAccMax = 5f;
+		xAccMin = 0.5f;
+		xVelMax = 0.01f;
 		//get the collider 2d player and then get the width 
 		xSpeed = 0.05f;
 		if (player.transform.position.x - transform.position.x >= 0) {
 			dir = 1;
+			xTarget = xTargetRight;
 		} else {
 			dir = -1;
+			xTarget = xTargetLeft;
+		}
+		if (transform.position.y < viewportTop) {
+			enteredScreen = true;
+		} else {
+			enteredScreen = false;
 		}
 	}
 	
@@ -66,8 +91,11 @@ public class MonoeyeAI : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
+		yTargetTop = camera.ViewportToWorldPoint(new Vector3(0, 0.85f, transform.position.z)).y;
+		yTargetBot = camera.ViewportToWorldPoint(new Vector3(0, 0.75f, transform.position.z)).y;
+		viewportTop = camera.ViewportToWorldPoint(new Vector3(0, 1f, transform.position.z)).y;
 		// Set y target
-		yTarget = camera.ViewportToWorldPoint (new Vector3 (0, 0.8f, transform.position.z)).y;
+//		yTarget = camera.ViewportToWorldPoint (new Vector3 (0, 0.8f, transform.position.z)).y;
 		// Set the seek force to target
 		yTargetForce = (yTarget - transform.position.y) * 15;
 		// Limit the seek force min/max
@@ -87,18 +115,71 @@ public class MonoeyeAI : MonoBehaviour {
 			body.AddForce (new Vector2(0, yval));
 		}
 
-		// Move player horiz
-		transform.position += new Vector3 (xSpeed * dir, 0);
-		// Flip direction when near edge of screen
-		if (transform.position.x >= viewportRight) {
+		if (!enteredScreen && transform.position.y < viewportTop) {
+			enteredScreen = true;
+		}
+		if (enteredScreen && transform.position.y > viewportTop) {
+			transform.position = new Vector3 (transform.position.x, viewportTop);
+		}
+
+		if (transform.position.y < yTarget) {
+			yTarget = yTargetTop;
+		} else if (transform.position.y > yTarget) {
+			yTarget = yTargetBot;
+		}
+//		if (dir == -1) {
+//			xTarget = xTargetLeft;
+//		} else {
+//			xTarget = xTargetRight;
+//		}
+
+		xTargetForce = (xTarget - transform.position.x) * 10;
+		if (Mathf.Abs(xTargetForce) > xAccMax) {
+			xTargetForce = xAccMax * Mathf.Sign(xTargetForce);
+		}
+		if (Mathf.Abs(xTargetForce) < xAccMin) {
+			xTargetForce = xAccMin * Mathf.Sign(xTargetForce);
+		}
+		body.AddForce (new Vector2 (xTargetForce, 0));
+		// Limit my velocity
+		if (Mathf.Abs(body.velocity.x) > xVelMax) {
+			float xval;
+			// Add an opposite force represented by difference between yVel and yVelMax
+			xval = -(body.velocity.x - (xVelMax * Mathf.Sign(body.velocity.x)));
+
+			body.AddForce (new Vector2(xval, 0));
+		}
+
+		if (transform.position.x >= xTarget && dir == 1) {
 			ChangeDir (-1);
-		} else if (transform.position.x <= viewportLeft) {
+			xTarget = xTargetLeft;
+		} else if (transform.position.x <= xTarget && dir == -1) {
 			ChangeDir (1);
+			xTarget = xTargetRight;
 		}
-		// Limit horiz movespeed
-		if (xSpeed > 0.05f) {
-			xSpeed = 0.05f;
+		if (transform.position.x > viewportRight) {
+			transform.position = new Vector3(viewportRight, transform.position.y);
 		}
+		if (transform.position.x < viewportLeft) {
+			transform.position = new Vector3(viewportLeft, transform.position.y);
+		}
+//		Debug.Log (transform.position.x);
+//		Debug.Log (xTarget);
+		Debug.Log (yTarget);
+
+
+//		// Move player horiz
+//		transform.position += new Vector3 (xSpeed * dir, 0);
+//		// Flip direction when near edge of screen
+//		if (transform.position.x >= viewportRight) {
+//			ChangeDir (-1);
+//		} else if (transform.position.x <= viewportLeft) {
+//			ChangeDir (1);
+//		}
+//		// Limit horiz movespeed
+//		if (xSpeed > 0.05f) {
+//			xSpeed = 0.05f;
+//		}
 	}
 
 	void ChangeDir (int newDir) {
