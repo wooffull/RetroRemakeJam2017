@@ -82,6 +82,7 @@ public class Collectable : MonoBehaviour {
             // Reaches the time where it dissapears
             if(currentTime >= (startTime + duration))
             {
+                Destroy(gameObject.GetComponent<Collectable>());
                 Destroy(gameObject);
             }
         }
