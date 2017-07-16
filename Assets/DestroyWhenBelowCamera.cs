@@ -35,7 +35,7 @@ public class DestroyWhenBelowCamera : MonoBehaviour
 
 			if (gameObject.tag == "Player")
             {
-                SceneManager.LoadScene("GameScene");
+                SceneManager.LoadScene("GameOverScene");
             }
         }
 	}
