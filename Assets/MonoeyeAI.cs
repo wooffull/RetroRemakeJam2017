@@ -36,14 +36,17 @@ public class MonoeyeAI : MonoBehaviour {
 	private float yTargetBot;
 	private bool enteredScreen;
 	private float viewportTop;
+	private float viewportBot;
+	private bool seeking;
 	// Use this for initialization
 	void Start () {
+		seeking = false;
 		player = GameObject.Find ("Player");
 		body = GetComponent<Rigidbody2D> ();
-		collid = gameObject.GetComponent<Collider2D> ();
 		timesFlipped = 0;
 		camera = Camera.main;
 		viewportTop = camera.ViewportToWorldPoint(new Vector3(0, 1f, transform.position.z)).y;
+		viewportBot = camera.ViewportToWorldPoint(new Vector3(0, 0f, transform.position.z)).y;
 		yTargetTop = camera.ViewportToWorldPoint(new Vector3(0, 0.85f, transform.position.z)).y;
 		yTargetBot = camera.ViewportToWorldPoint(new Vector3(0, 0.75f, transform.position.z)).y;
 		viewportMin = camera.ViewportToWorldPoint (new Vector3 (0, 0, transform.position.z)).x;
@@ -91,9 +94,16 @@ public class MonoeyeAI : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
+		if (seeking) {
+			xTarget = player.transform.position.x;
+		}
+		if (seeking) {
+			yTarget = viewportBot;
+		}
 		yTargetTop = camera.ViewportToWorldPoint(new Vector3(0, 0.85f, transform.position.z)).y;
 		yTargetBot = camera.ViewportToWorldPoint(new Vector3(0, 0.75f, transform.position.z)).y;
 		viewportTop = camera.ViewportToWorldPoint(new Vector3(0, 1f, transform.position.z)).y;
+		viewportBot = camera.ViewportToWorldPoint(new Vector3(0, 0f, transform.position.z)).y;
 		// Set y target
 //		yTarget = camera.ViewportToWorldPoint (new Vector3 (0, 0.8f, transform.position.z)).y;
 		// Set the seek force to target
@@ -123,9 +133,13 @@ public class MonoeyeAI : MonoBehaviour {
 		}
 
 		if (transform.position.y < yTarget) {
-			yTarget = yTargetTop;
+			if (!seeking) {
+				yTarget = yTargetTop;
+			}
 		} else if (transform.position.y > yTarget) {
-			yTarget = yTargetBot;
+			if (!seeking) {
+				yTarget = yTargetBot;
+			}
 		}
 //		if (dir == -1) {
 //			xTarget = xTargetLeft;
@@ -152,10 +166,14 @@ public class MonoeyeAI : MonoBehaviour {
 
 		if (transform.position.x >= xTarget && dir == 1) {
 			ChangeDir (-1);
-			xTarget = xTargetLeft;
+			if (!seeking) {
+				xTarget = xTargetLeft;
+			}
 		} else if (transform.position.x <= xTarget && dir == -1) {
 			ChangeDir (1);
-			xTarget = xTargetRight;
+			if (!seeking) {
+				xTarget = xTargetRight;
+			}
 		}
 		if (transform.position.x > viewportRight) {
 			transform.position = new Vector3(viewportRight, transform.position.y);
@@ -165,7 +183,10 @@ public class MonoeyeAI : MonoBehaviour {
 		}
 //		Debug.Log (transform.position.x);
 //		Debug.Log (xTarget);
-		Debug.Log (yTarget);
+//		Debug.Log (yTarget);
+
+
+
 
 
 //		// Move player horiz
@@ -185,5 +206,11 @@ public class MonoeyeAI : MonoBehaviour {
 	void ChangeDir (int newDir) {
 		dir = newDir;
 		timesFlipped++;
+	}
+
+	void OnMonoeyeSeek () {
+		if (timesFlipped > 3) {
+			seeking = true;
+		}
 	}
 }
