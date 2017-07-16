@@ -7,16 +7,16 @@ public class MonoeyeAI : MonoBehaviour {
 	private float intermittent_pos;
 	private Collider2D collid;
 	private new Camera camera;
-	private float yBand;
-	public float speed;
+	private float yTarget;
+	public float xSpeed;
 	private int dir;
 	private Rigidbody2D body;
-	private Vector3 viewportLeft;
-	private Vector3 viewportRight;
-	private Vector3 viewportLeftInner;
-	private Vector3 viewportRightInner;
-	private Vector3 viewportMax;
-	private Vector3 viewportMin;
+	private float viewportLeft;
+	private float viewportRight;
+	private float viewportLeftInner;
+	private float viewportRightInner;
+	private float viewportMax;
+	private float viewportMin;
 	private GameObject player;
 	private int timesFlipped;
 	private float playerWidth;
@@ -24,7 +24,7 @@ public class MonoeyeAI : MonoBehaviour {
 	private float xMax;
 	private float xMin;
 	private float yVelMax;
-	private float yBandForce;
+	private float yTargetForce;
 	private float yAccMax;
 	private float yAccMin;
 	// Use this for initialization
@@ -34,20 +34,18 @@ public class MonoeyeAI : MonoBehaviour {
 		collid = gameObject.GetComponent<Collider2D> ();
 		timesFlipped = 0;
 		camera = Camera.main;
-		yBand = camera.ViewportToWorldPoint(new Vector3(0, 0.8f, transform.position.z)).y;
-		viewportMin = camera.ViewportToWorldPoint (new Vector3 (0, 0, transform.position.z));
-		viewportMax = camera.ViewportToWorldPoint (new Vector3 (1f, 0, transform.position.z));
-		viewportLeft = camera.ViewportToWorldPoint (new Vector3 (0.1f, 0, transform.position.z));
-		viewportRight = camera.ViewportToWorldPoint (new Vector3 (0.9f, 0, transform.position.z));
-		viewportLeftInner = camera.ViewportToWorldPoint (new Vector3 (0.3f, 0, transform.position.z));
-		viewportRightInner = camera.ViewportToWorldPoint (new Vector3 (0.7f, 0, transform.position.z));
-		xMax = viewportRight.x;
-		xMin = viewportLeft.x;
+		yTarget = camera.ViewportToWorldPoint(new Vector3(0, 0.8f, transform.position.z)).y;
+		viewportMin = camera.ViewportToWorldPoint (new Vector3 (0, 0, transform.position.z)).x;
+		viewportMax = camera.ViewportToWorldPoint (new Vector3 (1f, 0, transform.position.z)).x;
+		viewportLeft = camera.ViewportToWorldPoint (new Vector3 (0.1f, 0, transform.position.z)).x;
+		viewportRight = camera.ViewportToWorldPoint (new Vector3 (0.9f, 0, transform.position.z)).x;
+		viewportLeftInner = camera.ViewportToWorldPoint (new Vector3 (0.3f, 0, transform.position.z)).x;
+		viewportRightInner = camera.ViewportToWorldPoint (new Vector3 (0.7f, 0, transform.position.z)).x;
 		yAccMax = 10f;
 		yAccMin = 0.5f;
 		yVelMax = 1.0f;
-		//get the fucking collider 2d player and then get the width 
-		speed = 0.05f;
+		//get the collider 2d player and then get the width 
+		xSpeed = 0.05f;
 		if (player.transform.position.x - transform.position.x >= 0) {
 			dir = 1;
 		} else {
@@ -68,36 +66,38 @@ public class MonoeyeAI : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		yBand = camera.ViewportToWorldPoint (new Vector3 (0, 0.8f, transform.position.z)).y;
-		Debug.Log (body.velocity);
-		yBandForce = (yBand - transform.position.y) * 15;
-		if (Mathf.Abs(yBandForce) > yAccMax) {
-			yBandForce = yAccMax * Mathf.Sign(yBandForce);
+		// Set y target
+		yTarget = camera.ViewportToWorldPoint (new Vector3 (0, 0.8f, transform.position.z)).y;
+		// Set the seek force to target
+		yTargetForce = (yTarget - transform.position.y) * 15;
+		// Limit the seek force min/max
+		if (Mathf.Abs(yTargetForce) > yAccMax) {
+			yTargetForce = yAccMax * Mathf.Sign(yTargetForce);
 		}
-		if (Mathf.Abs(yBandForce) < yAccMin) {
-			yBandForce = yAccMin * Mathf.Sign(yBandForce);
+		if (Mathf.Abs(yTargetForce) < yAccMin) {
+			yTargetForce = yAccMin * Mathf.Sign(yTargetForce);
 		}
-		body.AddForce (new Vector2 (0, yBandForce));
-		Debug.Log ("new vel" + body.velocity);
+		body.AddForce (new Vector2 (0, yTargetForce));
+		// Limit my velocity
 		if (Mathf.Abs(body.velocity.y) > yVelMax) {
 			float yval;
-			if (body.velocity.y < 0) {
-				yval = -(body.velocity.y + yVelMax);
-			} else {
-				yval = -(body.velocity.y - yVelMax);
-			}
-			Vector2 whocares = new Vector2(0, yval);
-			body.AddForce (whocares);
-		}
-		transform.position += new Vector3 (speed * dir, 0);
-		if (transform.position.x >= viewportRight.x) {
-			ChangeDir (-1);
-		} else if (transform.position.x <= viewportLeft.x) {
-			ChangeDir (1);
+			// Add an opposite force represented by difference between yVel and yVelMax
+			yval = -(body.velocity.y - (yVelMax * Mathf.Sign(body.velocity.y)));
+
+			body.AddForce (new Vector2(0, yval));
 		}
 
-		if (speed > 0.05f) {
-			speed = 0.05f;
+		// Move player horiz
+		transform.position += new Vector3 (xSpeed * dir, 0);
+		// Flip direction when near edge of screen
+		if (transform.position.x >= viewportRight) {
+			ChangeDir (-1);
+		} else if (transform.position.x <= viewportLeft) {
+			ChangeDir (1);
+		}
+		// Limit horiz movespeed
+		if (xSpeed > 0.05f) {
+			xSpeed = 0.05f;
 		}
 	}
 
