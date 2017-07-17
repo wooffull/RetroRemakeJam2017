@@ -13,12 +13,14 @@ public class Shoot : MonoBehaviour {
     private GameObject player;
     private PlayerMovement playerMovement;
     private Stats playerStats;
+    private AudioManager audioManager;
 
     void Start()
     {
         player = GameObject.Find("Player");
         playerMovement = player.GetComponent<PlayerMovement>();
         playerStats = gameObject.GetComponent<Stats>();
+        audioManager = GameObject.Find("Audio").GetComponent<AudioManager>();
     }
 
     void Update()
@@ -37,6 +39,7 @@ public class Shoot : MonoBehaviour {
         arrowComponent.speed = arrowTravelDistance / arrowTravelTime;
         arrowComponent.maxLifeTime = arrowTravelTime;
         arrowComponent.damage = playerStats.damage;
+        audioManager.PlayShootArrowSound();
 
         if (playerMovement.isUp)
         {

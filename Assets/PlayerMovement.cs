@@ -148,6 +148,12 @@ public class PlayerMovement : MonoBehaviour
         // Otherwise, if the player can jump, jump!
         else if (canJump)
         {
+            // Play the jump sound if this is the beginning of the jump
+            if (jumpTimer == 0)
+            {
+                audioManager.PlayJumpSound();
+            }
+
             if (jumpTimer < totalJumpTime)
             {
                 jumpTimer += deltaTimeSinceLastJump;

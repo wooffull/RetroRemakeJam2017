@@ -8,6 +8,8 @@ public class AudioManager : MonoBehaviour
     public AudioClip collectMoneySfx;
     public AudioClip denySfx;
     public AudioClip takeDamageSfx;
+    public AudioClip jumpSfx;
+    public AudioClip shootArrowSfx;
 
     public float denySfxThrottleTime = 0.25f;
 
@@ -48,6 +50,11 @@ public class AudioManager : MonoBehaviour
         Play(collectMoneySfx);
     }
 
+    public void PlayJumpSound()
+    {
+        Play(jumpSfx);
+    }
+
     public void PlayDenySound()
     {
         if (Time.time - lastDenySfxStartTime >= denySfxThrottleTime)
@@ -55,6 +62,11 @@ public class AudioManager : MonoBehaviour
             lastDenySfxStartTime = Time.time;
             Play(denySfx);
         }
+    }
+
+    public void PlayShootArrowSound()
+    {
+        Play(shootArrowSfx);
     }
 
     private void Play(AudioClip audioClip)
