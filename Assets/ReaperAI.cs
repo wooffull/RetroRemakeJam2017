@@ -9,6 +9,7 @@ public class ReaperAI : MonoBehaviour {
     public float waitTime = 1;
     public float detectRange = 10;
     public float detectTime = 3;
+    public float randomTurnInterval = 3;
 
     private bool isLeft = false;
     private bool isWaiting = false;
