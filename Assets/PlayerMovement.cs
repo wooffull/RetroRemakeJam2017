@@ -87,6 +87,10 @@ public class PlayerMovement : MonoBehaviour
             isUp = false;
             collider.size = new Vector2(1, 1.92f * (2f / 3f));
             collider.offset = new Vector2(0, 0.95f * (2f / 3f));
+            if(isGrounded) // Prevents Pit from jumping while crouching on the ground
+            {
+                canJump = false;
+            }
             //canMove = true;
         }
         else if (verticalInput > 0) // Pit aims upward
@@ -130,7 +134,10 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Add movement from walking around
-        displacement.x += walkDirection * walkSpeed * Time.deltaTime;
+        if(!(isUp && isGrounded)) // Prevents Pit from moving along the ground while aiming up
+        {
+            displacement.x += walkDirection * walkSpeed * Time.deltaTime;
+        }
     }
 
     private void UpdateJump()
