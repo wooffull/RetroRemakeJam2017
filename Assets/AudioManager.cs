@@ -10,12 +10,14 @@ public class AudioManager : MonoBehaviour
     public AudioClip takeDamageSfx;
     public AudioClip jumpSfx;
     public AudioClip shootArrowSfx;
+    public AudioClip reaperSpotsPlayerSfx;
 
     public float denySfxThrottleTime = 0.25f;
 
     public static AudioManager instance = null;
 
     private float lastDenySfxStartTime = -1000;
+    private AudioSource mainBgm;
 
     void Awake()
     {
@@ -33,6 +35,11 @@ public class AudioManager : MonoBehaviour
 
         // This won't be destroyed when reloading scenes
         DontDestroyOnLoad(gameObject);
+    }
+
+    void Start()
+    {
+        mainBgm = gameObject.GetComponent<AudioSource>();
     }
 
     public void PlayHealSound()
@@ -69,10 +76,23 @@ public class AudioManager : MonoBehaviour
         Play(shootArrowSfx);
     }
 
+    public void PlayReaperSpotsPlayerSound()
+    {
+        Play(reaperSpotsPlayerSfx);
+        StartCoroutine(DuckMainBgm(reaperSpotsPlayerSfx.length));
+    }
+
     private void Play(AudioClip audioClip)
     {
         AudioSource a = gameObject.AddComponent<AudioSource>();
         a.clip = audioClip;
         a.Play();
+    }
+
+    private IEnumerator DuckMainBgm(float duration)
+    {
+        mainBgm.volume = 0.1f;
+        yield return new WaitForSecondsRealtime(duration);
+        mainBgm.volume = 1f;
     }
 }

@@ -32,6 +32,7 @@ public class ReaperAI : MonoBehaviour {
     private Vector3 leftSide;
     private Vector3 rightSide;
     private Vector3 currentSide;
+    private AudioManager audioManager;
 
     // Use this for initialization
     void Start()
@@ -47,6 +48,7 @@ public class ReaperAI : MonoBehaviour {
         leftSide = gameObject.transform.position - new Vector3(halfWidth, 0, 0);
         rightSide = gameObject.transform.position + new Vector3(halfWidth, 0, 0);
         currentSide = leftSide;
+        audioManager = GameObject.Find("Audio").GetComponent<AudioManager>();
     }
 
     // Method for reversing the direction of the Reaper
@@ -177,6 +179,12 @@ public class ReaperAI : MonoBehaviour {
         if(playerHit.collider != null && playerHit.collider.tag == "Player")
         {
             startDetectTime = Time.time;
+
+            if (playerDetected == false)
+            {
+                audioManager.PlayReaperSpotsPlayerSound();
+            }
+
             playerDetected = true;
         }
 

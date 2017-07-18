@@ -31,7 +31,6 @@ public class EnemySpawner : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (inRange) {
-			Debug.Log ("In range");
 			if (enemiesSpawned > 0 && (Time.time - lastTimeSpawned) > delay) {
 				if (enemiesSpawned < enemyCount) {
 					Instantiate (enemy, transform);
