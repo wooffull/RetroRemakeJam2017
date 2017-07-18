@@ -25,7 +25,6 @@ public class Stats : MonoBehaviour {
     }
 
     private int _health;
-    private int highScore;
     private float currentTime;
     private float startTime;
     private bool isPlayerDead;
@@ -43,7 +42,6 @@ public class Stats : MonoBehaviour {
         collider = gameObject.GetComponent<Collider2D>();
         isPlayerDead = false;
         playerStats = GameObject.Find("Player").GetComponent<Stats>();
-        highScore = PlayerPrefs.GetInt("High Score");
 
         // Determines if it is the player
         if (gameObject.name == "Player")
@@ -89,12 +87,6 @@ public class Stats : MonoBehaviour {
             if(currentTime > (startTime + 1)) // Stays still for 1 second before falling
             {
                 transform.position += Vector3.down * 0.1f;
-            }
-
-            // Set a new high score
-            if(money > highScore)
-            {
-                PlayerPrefs.SetInt("High Score", highScore);
             }
         }
         else if(health <= 0) // If it is not the player, the enemy dies
