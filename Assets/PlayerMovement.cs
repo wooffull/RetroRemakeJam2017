@@ -134,7 +134,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Add movement from walking around
-        if(!(isUp && isGrounded)) // Prevents Pit from moving along the ground while aiming up
+        if(!((isUp || isCrouch) && isGrounded)) // Prevents Pit from moving along the ground while aiming up or crouching
         {
             displacement.x += walkDirection * walkSpeed * Time.deltaTime;
         }
