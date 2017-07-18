@@ -31,6 +31,9 @@ public class PlayerAnimations : MonoBehaviour {
     public int fastAnimationFrameDelay = 1;
     public int fastAnimationEndFrameDuration = 3;
 
+    [HideInInspector]
+    public bool shootActive = false;
+
     private int frameCount = 0;
     private int fastFrameCount = 0;
     private int startFrame = 0;
@@ -38,8 +41,8 @@ public class PlayerAnimations : MonoBehaviour {
     private int currentFrame;
     private bool frameCountActive = false;
     private bool fastFrameCountActive = false;
-    private bool shootActive = false;
     private bool endShootAnimation = false;
+    private Shoot playerShoot;
     private Sprite[] walkSprites;
     private Sprite[] jumpSprites;
     private Sprite[] groundShootSprites;
@@ -53,6 +56,7 @@ public class PlayerAnimations : MonoBehaviour {
     void Start () {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         playerMovement = gameObject.GetComponent<PlayerMovement>();
+        playerShoot = gameObject.GetComponent<Shoot>();
         walkSprites = new Sprite[4];
         jumpSprites = new Sprite[4];
         groundShootSprites = new Sprite[4];
@@ -120,7 +124,7 @@ public class PlayerAnimations : MonoBehaviour {
                     }
                 }
             }
-            else // Delays on the end frame to make the animation transition look smoother
+            else if (playerShoot.arrow == null) // Delays on the end frame to make the animation transition look smoother
             {
                 if (fastFrameCountActive && currentFrame > (fastStartFrame + fastAnimationEndFrameDuration))
                 {
