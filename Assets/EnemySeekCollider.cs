@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MonoeyeSeekCollider : MonoBehaviour {
+public class EnemySeekCollider : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
@@ -16,7 +16,7 @@ public class MonoeyeSeekCollider : MonoBehaviour {
 
 	void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.name == "Player") {
-			SendMessageUpwards ("OnMonoeyeSeek");
+			SendMessageUpwards ("OnEnemySeek");
 		}
 	}
 }

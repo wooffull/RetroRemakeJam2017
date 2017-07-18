@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MonoeyeAI : MonoBehaviour {
+public class ReapetteAI : MonoBehaviour {
 
 	private new Camera camera;
 	private Rigidbody2D body;
@@ -20,6 +20,7 @@ public class MonoeyeAI : MonoBehaviour {
 	private float yTarget;
 	private float yTargetTop;
 	private float yTargetBot;
+	private float ySeekSlice;
 	private float yVelMax;
 	private float xVelMax;
 	private float xTargetForce;
@@ -35,12 +36,14 @@ public class MonoeyeAI : MonoBehaviour {
 	private bool seeking;
 	private bool seekingPit;
 	private bool enteredScreen;
+	private bool soughtOnce;
 	// Use this for initialization
 	void Start () {
 		// Has seekZone collider hit player? (Broad phase seek)
 		seeking = false;
 		// Am I on my final descent, attempting to attack player? (Narrow phase seek)
 		seekingPit = false;
+		soughtOnce = false;
 		player = GameObject.Find ("Player");
 		body = GetComponent<Rigidbody2D> ();
 		// How many times have I reached left/right side of screen?
@@ -60,22 +63,26 @@ public class MonoeyeAI : MonoBehaviour {
 		// Permanent world point representing right side of screen
 		viewportRight = camera.ViewportToWorldPoint (new Vector3 (0.99f, 0, transform.position.z)).x;
 		// Current world point representing leftmost wander horizontal seek target
-		xTargetLeft = camera.ViewportToWorldPoint (new Vector3 (0.15f, 0, transform.position.z)).x;
+		xTargetLeft = camera.ViewportToWorldPoint (new Vector3 (0.05f, 0, transform.position.z)).x;
 		// Current world point representing rightmost wander horizontal seek target
-		xTargetRight = camera.ViewportToWorldPoint (new Vector3 (0.85f, 0, transform.position.z)).x;
+		xTargetRight = camera.ViewportToWorldPoint (new Vector3 (0.95f, 0, transform.position.z)).x;
 		// Max vertical accel
-		yAccMax = 3f;
+		yAccMax = 5f;
 		// Min vertical accel
 		yAccMin = 1f;
 		// Max vertical velocity
 		yVelMax = 0.1f;
 		// Lower offset from bottom of current screen position (used in narrow phase seek)
 		ySeekOffset = -100f;
+		// Screen height divisor
+		ySeekSlice = 3;
 		// Init yTarget to yTargetBot, causes a swoop in from top of screen
-		yTarget = yTargetBot;
+		yTarget = yTargetTop;
+
+		xTarget = transform.position.x;
 
 		// Max horizontal accel
-		xAccMax = 5f;
+		xAccMax = 7f;
 		// Min horiz accel
 		xAccMin = 0.5f;
 		// Max horiz velocity
@@ -83,15 +90,16 @@ public class MonoeyeAI : MonoBehaviour {
 		// Screen width divisor (for approximate horizontal bounds to init narrow phase seek)
 		xSeekSlice = 6;
 
+
 		// Determine which way I should face given my position and player's position
 		// Set horizontal target in my direction
-		if (player.transform.position.x - transform.position.x >= 0) {
-			dir = 1;
-			xTarget = xTargetRight;
-		} else {
-			dir = -1;
-			xTarget = xTargetLeft;
-		}
+//		if (player.transform.position.x - transform.position.x >= 0) {
+//			dir = 1;
+//			xTarget = xTargetRight;
+//		} else {
+//			dir = -1;
+//			xTarget = xTargetLeft;
+//		}
 		// Set enteredScreen bool to determine when to lock me to an upper screen boundary
 		if (transform.position.y < viewportTop) {
 			enteredScreen = true;
@@ -99,7 +107,7 @@ public class MonoeyeAI : MonoBehaviour {
 			enteredScreen = false;
 		}
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 
@@ -132,8 +140,8 @@ public class MonoeyeAI : MonoBehaviour {
 		// ---------------------------------------------------
 
 		// Set new Y targets and screen Y max/min world points
-		yTargetTop = camera.ViewportToWorldPoint(new Vector3(0, 0.85f, transform.position.z)).y;
-		yTargetBot = camera.ViewportToWorldPoint(new Vector3(0, 0.75f, transform.position.z)).y;
+		yTargetTop = player.transform.position.y + (Screen.height / ySeekSlice);
+		yTargetBot = player.transform.position.y - (Screen.height / ySeekSlice);
 		viewportTop = camera.ViewportToWorldPoint(new Vector3(0, 1f, transform.position.z)).y;
 		viewportBot = camera.ViewportToWorldPoint(new Vector3(0, 0f, transform.position.z)).y;
 
@@ -157,7 +165,7 @@ public class MonoeyeAI : MonoBehaviour {
 		}
 
 		// Make sure I actually entered from top of screen
-		if (!enteredScreen && transform.position.y < viewportTop) {
+		if (!enteredScreen && transform.position.y < yTarget) {
 			enteredScreen = true;
 		}
 		// If entered from top already (visible) then limit me from going back up off the screen
@@ -170,7 +178,7 @@ public class MonoeyeAI : MonoBehaviour {
 			if (!seeking) {
 				yTarget = yTargetTop;
 			}
-		// else if above the top wander target, set target to bottom
+			// else if above the top wander target, set target to bottom
 		} else if (transform.position.y > yTarget) {
 			if (!seeking) {
 				yTarget = yTargetBot;
@@ -199,18 +207,32 @@ public class MonoeyeAI : MonoBehaviour {
 			body.AddForce (new Vector2(xval, 0));
 		}
 
-		// If I am at right target and moving right, set target to left, change direction
-		if (transform.position.x >= xTarget && dir == 1) {
-			ChangeDir (-1);
-			if (!seeking) {
-				xTarget = xTargetLeft;
+		if (!enteredScreen) {
+			if (soughtOnce) {
+				// If I am at right target and moving right, set target to left, change direction
+				if (transform.position.x >= xTarget && dir == 1) {
+					ChangeDir (-1);
+					if (!seeking) {
+						xTarget = xTargetLeft;
+					}
+					// If I am at right target and moving left, set target to right, change direction
+				} else if (transform.position.x <= xTarget && dir == -1) {
+					ChangeDir (1);
+					if (!seeking) {
+						xTarget = xTargetRight;
+					}
+				}
+			} else {
+				if (dir == null) {
+					if (player.transform.position.x - transform.position.x >= 0) {
+						dir = 1;
+					} else {
+						dir = -1;
+					}
+				}
 			}
-		// If I am at right target and moving left, set target to right, change direction
-		} else if (transform.position.x <= xTarget && dir == -1) {
-			ChangeDir (1);
-			if (!seeking) {
-				xTarget = xTargetRight;
-			}
+		} else {
+			xTarget = transform.position.x;
 		}
 		// Limit me from moving right/left off screen
 		if (transform.position.x > viewportRight) {
@@ -227,9 +249,9 @@ public class MonoeyeAI : MonoBehaviour {
 		timesFlipped++;
 	}
 
-	// EnemySeekCollider calls me
+	// MonoeyeSeekCollider calls me
 	// Sets broad phase seek
-	void OnEnemySeek () {
+	void OnMonoeyeSeek () {
 		if (timesFlipped >= timesFlippedMax) {
 			seeking = true;
 		}
