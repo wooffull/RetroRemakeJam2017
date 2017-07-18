@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 477dd0dee1f2dcc4fa0618d8794481be
-timeCreated: 1500405083
+timeCreated: 1500409056
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
@@ -11,7 +11,7 @@ MonoImporter:
   - playerWalk3: {fileID: 21300000, guid: 1f222f23703d50544b39a2ca4382f5c3, type: 3}
   - playerWalk4: {fileID: 21300000, guid: 686dd3421950d6f4fa72d0a5b6e4d88d, type: 3}
   - playerCrouch: {fileID: 21300000, guid: 577ab0083d6edd540bb219aaf65761d6, type: 3}
-  - playerAimUp: {fileID: 21300000, guid: 3ec9b528d63735748b813d73dfa8aad4, type: 3}
+  - playerAimUp: {fileID: 21300000, guid: b92cd2ead19bd3d43a6fefba7f96ae41, type: 3}
   - playerJump1: {fileID: 21300000, guid: 651bb661f8467184b8226e47fc5d68e4, type: 3}
   - playerJump2: {fileID: 21300000, guid: cbed1db08f8b4034ba58476702996d33, type: 3}
   - playerJump3: {fileID: 21300000, guid: e472050747360e24684e5cee14d1e435, type: 3}
@@ -28,10 +28,10 @@ MonoImporter:
   - playerAirShoot2: {fileID: 21300000, guid: 250822f71152b4e56bae91786380a465, type: 3}
   - playerAirShoot3: {fileID: 21300000, guid: 0d9d0a38edbec4740a05e0e0c06d6186, type: 3}
   - playerAirShoot4: {fileID: 21300000, guid: e56d5e6ffbdc54fb9b45b29c2b12cca9, type: 3}
-  - playerUpShoot1: {fileID: 21300000, guid: 3ec9b528d63735748b813d73dfa8aad4, type: 3}
-  - playerUpShoot2: {fileID: 21300000, guid: b7ba5f2622ce2d24a88aeb78c7e921e4, type: 3}
-  - playerUpShoot3: {fileID: 21300000, guid: ac5f7ef8e1c25044e83cdd6db973f897, type: 3}
-  - playerUpShoot4: {fileID: 21300000, guid: 769db0a3ab4ff8d4a850ad2746f197e9, type: 3}
+  - playerUpShoot1: {fileID: 21300000, guid: b92cd2ead19bd3d43a6fefba7f96ae41, type: 3}
+  - playerUpShoot2: {fileID: 21300000, guid: 38d48e4cf63a6db44806e5bbccd86cb1, type: 3}
+  - playerUpShoot3: {fileID: 21300000, guid: ff63db5244ee36143837f30d239cfaaa, type: 3}
+  - playerUpShoot4: {fileID: 21300000, guid: 3593e834b620fac459f905ec0df9cbd9, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

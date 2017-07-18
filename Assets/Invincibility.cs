@@ -73,9 +73,22 @@ public class Invincibility : MonoBehaviour {
         }
     }
 
+    // Method for updating the count of enemies on screen
+    void UpdateEnemies()
+    {
+        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        enemyCount = enemies.Length;
+        enemyColliders = new Collider2D[enemyCount];
+        for (int i = 0; i < enemyCount; i++)
+        {
+            enemyColliders[i] = enemies[i].GetComponent<Collider2D>();
+        }
+    }
+
     // Update is called once per frame
     void Update () {
         currentTime = Time.time;
+        UpdateEnemies();
 
         // If the invincibility time has passed, set invincibility off
 		if(isInvincible && currentTime > (startTime + invincibilityTime))

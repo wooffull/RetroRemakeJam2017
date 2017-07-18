@@ -8,22 +8,26 @@ public class ReaperAI : MonoBehaviour {
     public float chargeSpeed = 0.1f;
     public float waitTime = 1;
     public float detectRange = 10;
-    public float detectTime = 3;
-    public float randomTurnInterval = 3;
+    public float detectTime = 6;
+    public float turnInterval = 3;
 
     private bool isLeft = false;
     private bool isWaiting = false;
     private bool isHit = false;
+    private bool isTurning = false;
+    private bool isTurningDisabled = false;
     private bool playerDetected = false;
     private float currentTime;
     private float startTime;
     private float startDetectTime;
+    private float startTurnTime;
     private float halfWidth;
     private int layerIndex;
     private int playerLayerIndex;
     private int currentEnemyHealth;
     private RaycastHit2D hit;
     private RaycastHit2D playerHit;
+    private RaycastHit2D blockHit;
     private Collider2D collider;
     private Vector3 lastPosition;
     private GameObject player;
@@ -56,7 +60,6 @@ public class ReaperAI : MonoBehaviour {
     {
         speed *= -1;
         chargeSpeed *= -1;
-        Wait();
 
         if (isLeft)
         {
@@ -119,6 +122,15 @@ public class ReaperAI : MonoBehaviour {
             isHit = true;
         }
 
+        // Reaper turns around at the set interval
+        if(currentTime > (startTurnTime + turnInterval) && !isTurningDisabled)
+        {
+            startTurnTime = Time.time;
+            isTurning = true;
+            ReverseDirection();
+            Wait();
+        }
+
         // Reaper is actively moving
         if (!isWaiting)
         {
@@ -128,6 +140,7 @@ public class ReaperAI : MonoBehaviour {
             if (hit.collider == null)
             {
                 ReverseDirection();
+                Wait();
             }
             else
             {
@@ -148,6 +161,14 @@ public class ReaperAI : MonoBehaviour {
             {
                 isWaiting = false;
 
+                // Reaper resumes the direction it turned from
+                if(isTurning && !isTurningDisabled)
+                {
+                    ReverseDirection();
+                    isTurning = false;
+                    startTurnTime = Time.time;
+                }
+
                 // Reaper was hit and turns in the direction of the player
                 if(isHit)
                 {
@@ -162,21 +183,24 @@ public class ReaperAI : MonoBehaviour {
         {
             hit = Physics2D.Raycast(transform.position, Vector3.left, 0.64f, layerIndex);
             playerHit = Physics2D.Raycast(transform.position, Vector3.left, detectRange, playerLayerIndex);
+            blockHit = Physics2D.Raycast(transform.position, Vector3.left, detectRange, layerIndex);
         }
         else
         {
             hit = Physics2D.Raycast(transform.position, Vector3.right, 0.64f, layerIndex);
             playerHit = Physics2D.Raycast(transform.position, Vector3.right, detectRange, playerLayerIndex);
+            blockHit = Physics2D.Raycast(transform.position, Vector3.left, detectRange, layerIndex);
         }
 
         // Hits a block and reverses direction
         if (hit.collider != null && hit.collider.tag == "Block")
         {
             ReverseDirection();
+            Wait();
         }
 
         // Detects the player if they are found in sight
-        if(playerHit.collider != null && playerHit.collider.tag == "Player")
+        if(playerHit.collider != null && playerHit.collider.tag == "Player" && playerHit.distance < blockHit.distance)
         {
             startDetectTime = Time.time;
 
@@ -186,12 +210,20 @@ public class ReaperAI : MonoBehaviour {
             }
 
             playerDetected = true;
+            isWaiting = false;
+            isTurningDisabled = true;
+            isTurning = false;
         }
 
         // Reaper stops chasing the player
         if(currentTime > (startDetectTime + detectTime))
         {
-            playerDetected = false;
+            if(playerDetected)
+            {
+                playerDetected = false;
+                isTurningDisabled = false;
+                startTurnTime = Time.time;
+            }
         }
     }
 }
