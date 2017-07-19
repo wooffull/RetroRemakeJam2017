@@ -216,7 +216,7 @@ public class ReaperAI : MonoBehaviour {
         }
 
         // Detects the player if they are found in sight
-        if(playerHit.collider != null && playerHit.collider.tag == "Player" && playerHit.distance < blockHit.distance)
+        if(playerHit.collider != null && playerHit.collider.tag == "Player" && (blockHit.collider == null || (blockHit.collider != null && playerHit.distance < blockHit.distance)))
         {
             startDetectTime = Time.time;
 

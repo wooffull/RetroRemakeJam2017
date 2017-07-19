@@ -50,14 +50,19 @@ public class Arrow : MonoBehaviour {
         // Damage the enemy and play a sound
         if (c.gameObject.tag == "Enemy" && !arrowDisabled)
         {
-            Stats stats = c.gameObject.GetComponent<Stats>();
-            stats.health -= damage;
+            if (damage > 0)
+            {
+                Stats stats = c.gameObject.GetComponent<Stats>();
+                stats.health -= damage;
+                damage = 0;
 
-            audioManager.PlayTakeDamageSound();
+                audioManager.PlayTakeDamageSound();
+            }
         }
 
         if (c.gameObject.tag == "Enemy" || c.gameObject.tag == "Block")
         {
+            damage = 0;
             Destroy(gameObject);
         }
     }
