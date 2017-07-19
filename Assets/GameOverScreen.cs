@@ -18,6 +18,12 @@ public class GameOverScreen : MonoBehaviour {
 	void Update () {
         timer += Time.deltaTime;
 
+        // Quit the game
+        if (Input.GetKeyDown("q"))
+        {
+            Application.Quit();
+        }
+
         if (timer >= totalTimeUntilNextScene)
         {
             SceneManager.LoadScene("GameScene");

@@ -92,7 +92,7 @@ public class PlayerAnimations : MonoBehaviour {
         transform.localScale = new Vector3(-1, 1, 1);
     }
 
-    // Method for making hte sprites face right
+    // Method for making the sprites face right
     void RightSprites()
     {
         transform.localScale = new Vector3(1, 1, 1);

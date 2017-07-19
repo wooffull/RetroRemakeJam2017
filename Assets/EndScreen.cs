@@ -26,8 +26,12 @@ public class EndScreen : MonoBehaviour {
         highScoreText.text = "High Score: " + highScore.ToString().PadLeft(3, '0');
         currentScoreText.text = "Your Score: " + currentScore.ToString().PadLeft(3, '0');
 
-        // Play again
-        if (Input.anyKeyDown)
+        // Quit the game
+        if (Input.GetKeyDown("q"))
+        {
+            Application.Quit();
+        }
+        else if (Input.anyKeyDown) // Play again
         {
             SceneManager.LoadScene("GameScene");
         }

@@ -44,6 +44,18 @@ public class ShemumAI : MonoBehaviour {
         TargetPlayer();
     }
 
+    // Method for making the sprites face left
+    void LeftSprites()
+    {
+        transform.localScale = new Vector3(-1, 1, 1);
+    }
+
+    // Method for making the sprites face right
+    void RightSprites()
+    {
+        transform.localScale = new Vector3(1, 1, 1);
+    }
+
     // Method for reversing the direction of the Shemum
     void ReverseDirection()
     {
@@ -109,6 +121,17 @@ public class ShemumAI : MonoBehaviour {
     {
         currentTime = Time.time;
         UpdatePoints();
+
+        // Determines direction the sprites will face
+        if (isLeft)
+        {
+            LeftSprites();
+        }
+        else
+        {
+            RightSprites();
+        }
+
         // Shemum is actively moving
         if (!isWaiting)
         {
