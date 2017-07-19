@@ -114,10 +114,8 @@ public class ReapetteAI : MonoBehaviour {
 		// Set horizontal target in my direction
 		if (player.transform.position.x - transform.position.x >= 0) {
 			dir = 1;
-//			xTarget = xTargetRight;
 		} else {
 			dir = -1;
-//			xTarget = xTargetLeft;
 		}
 		// Set enteredScreen bool to determine when to lock me to an upper screen boundary
 		if (transform.position.y < viewportTop) {
@@ -263,7 +261,6 @@ public class ReapetteAI : MonoBehaviour {
 
 				// if seeking bottom and reached, switch to top
 				if (transform.position.y <= yTargetBot && yTarget == yTargetBot) {
-					Debug.Log ("Bot met");
 					yTargetTop = player.transform.position.y + (height / ySeekSlice);
 					yTarget = yTargetTop;
 				}
@@ -303,9 +300,6 @@ public class ReapetteAI : MonoBehaviour {
 				transform.position = new Vector3(transform.position.x, viewportBot);
 			}
 		}
-//		yTargetTop = player.transform.position.y + (height / ySeekSlice);
-//		yTargetBot = player.transform.position.y - (height / ySeekSlice);
-
 	}
 
 	// Change the direction I am facing

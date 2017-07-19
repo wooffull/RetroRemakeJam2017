@@ -10,6 +10,7 @@ public class ReaperAI : MonoBehaviour {
     public float detectRange = 10;
     public float detectTime = 6;
     public float turnInterval = 3;
+	public GameObject reapetteSpawner;
 
     private bool isLeft = false;
     private bool isWaiting = false;
@@ -22,6 +23,9 @@ public class ReaperAI : MonoBehaviour {
     private float startDetectTime;
     private float startTurnTime;
     private float halfWidth;
+	private float screenTop;
+	private float lastSpawnTime;
+	private float reapetteSpawnerTimeBuffer;
     private int layerIndex;
     private int playerLayerIndex;
     private int currentEnemyHealth;
@@ -37,10 +41,15 @@ public class ReaperAI : MonoBehaviour {
     private Vector3 rightSide;
     private Vector3 currentSide;
     private AudioManager audioManager;
+	private new Camera camera;
 
     // Use this for initialization
     void Start()
     {
+		reapetteSpawnerTimeBuffer = 5f;
+		lastSpawnTime = 0;
+		camera = Camera.main;
+		screenTop = camera.ViewportToWorldPoint (new Vector3(0, 1f, transform.position.z)).y;
         collider = gameObject.GetComponent<Collider2D>();
         blocks = GameObject.FindGameObjectsWithTag("Block");
         layerIndex = 1 << LayerMask.NameToLayer("Block");
@@ -111,6 +120,7 @@ public class ReaperAI : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+		screenTop = camera.ViewportToWorldPoint (new Vector3(0, 1f, transform.position.z)).y;
         currentTime = Time.time;
         UpdatePoints();
 
@@ -213,6 +223,11 @@ public class ReaperAI : MonoBehaviour {
             isWaiting = false;
             isTurningDisabled = true;
             isTurning = false;
+
+			if (GameObject.Find ("Reapette(Clone)") == null && Time.time - lastSpawnTime > reapetteSpawnerTimeBuffer) {
+				Instantiate (reapetteSpawner, new Vector3(player.transform.position.x, screenTop + 2f), Quaternion.identity);
+				lastSpawnTime = Time.time;
+			}
         }
 
         // Reaper stops chasing the player
