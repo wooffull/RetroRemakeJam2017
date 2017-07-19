@@ -77,8 +77,8 @@ public class ShemumAI : MonoBehaviour {
     // Method for updating points for raycasting
     void UpdatePoints()
     {
-        leftSide = gameObject.transform.position - new Vector3(halfWidth, 0, 0);
-        rightSide = gameObject.transform.position + new Vector3(halfWidth, 0, 0);
+        leftSide = gameObject.transform.position - new Vector3(halfWidth + 0.02f, 0, 0);
+        rightSide = gameObject.transform.position + new Vector3(halfWidth + 0.02f, 0, 0);
         if (isLeft)
         {
             currentSide = rightSide;
@@ -138,6 +138,16 @@ public class ShemumAI : MonoBehaviour {
                 TargetPlayer();
                 if(!isFalling)
                 {
+                    // Undo offset considered for raycasing in UpdatePoints()
+                    if (isLeft)
+                    {
+                        transform.position += new Vector3(.02f, 0, 0);
+                    }
+                    else
+                    {
+                        transform.position += new Vector3(-.02f, 0, 0);
+                    }
+
                     isFalling = true;
                     fallFromPosition = transform.position;
                 }

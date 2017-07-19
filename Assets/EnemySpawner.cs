@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour {
 	public GameObject enemy;
-	public float delay;
-	public int enemyCount;
-	public float screenYOffsetUntilSpawn;
+	public float delay = 0.5f;
+	public int enemyCount = 4;
+	public float screenYOffsetUntilSpawn = 5f;
 	private float lastTimeSpawned;
 	private int enemiesSpawned;
 	private new Camera camera;
@@ -14,17 +14,8 @@ public class EnemySpawner : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		camera = Camera.main;
-		if (screenYOffsetUntilSpawn == null) {
-			screenYOffsetUntilSpawn = 5f;
-		}
 		enemiesSpawned = 0;
 		lastTimeSpawned = Time.time;
-		if (delay == null) {
-			delay = 0.5f;
-		}
-		if (enemyCount == null) {
-			enemyCount = 4;
-		}
 		inRange = false;
 	}
 	
@@ -33,15 +24,17 @@ public class EnemySpawner : MonoBehaviour {
 		if (inRange) {
 			if (enemiesSpawned > 0 && (Time.time - lastTimeSpawned) > delay) {
 				if (enemiesSpawned < enemyCount) {
-					Instantiate (enemy, transform);
+					Instantiate (enemy, transform.position, Quaternion.identity);
 					enemiesSpawned++;
 					lastTimeSpawned = Time.time;
 				} else {
 					Destroy (this);
 				}
-			} else if (enemiesSpawned == 0) {
-				Instantiate (enemy, transform);
-				enemiesSpawned++;
+			}
+            else if (enemiesSpawned == 0)
+            {
+                Instantiate(enemy, transform.position, Quaternion.identity);
+                enemiesSpawned++;
 				lastTimeSpawned = Time.time;
 			}
 		} else {

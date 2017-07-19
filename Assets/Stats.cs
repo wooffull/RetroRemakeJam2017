@@ -25,6 +25,7 @@ public class Stats : MonoBehaviour {
     }
 
     private int _health;
+    private bool hasDied = false;
     private float currentTime;
     private float startTime;
     private bool isPlayerDead;
@@ -33,6 +34,7 @@ public class Stats : MonoBehaviour {
     private Rigidbody2D rigidBody;
     private Collider2D collider;
     private Stats playerStats;
+    private AudioManager audioManager;
 
     // Use this for initialization
     void Start () {
@@ -42,10 +44,12 @@ public class Stats : MonoBehaviour {
         collider = gameObject.GetComponent<Collider2D>();
         isPlayerDead = false;
         playerStats = GameObject.Find("Player").GetComponent<Stats>();
+        audioManager = GameObject.Find("Audio").GetComponent<AudioManager>();
 
         // Determines if it is the player
         if (gameObject.name == "Player")
         {
+            audioManager.PlayPlayerStartSound();
             isPlayer = true;
         }
         else
@@ -84,8 +88,14 @@ public class Stats : MonoBehaviour {
                 isPlayerDead = true;
             }
 
-            if(currentTime > (startTime + 1)) // Stays still for 1 second before falling
+            if (currentTime > (startTime + 1)) // Stays still for 1 second before falling
             {
+                if (!hasDied)
+                {
+                    audioManager.PlayPlayerDeathSound();
+                }
+
+                hasDied = true;
                 transform.position += Vector3.down * 0.1f;
             }
         }

@@ -43,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
             ContactPoint2D contact = c.contacts[0];
 
             // If the collision was below the player, the player is grounded
-            if (rigidBody.velocity.y <= 0 && Vector3.Dot(contact.normal, Vector2.up) > 0.75f)
+            if (rigidBody.velocity.y <= 0 && displacement.y <= 0 && Vector3.Dot(contact.normal, Vector2.up) > 0.75f)
             {
                 ResetJump();
                 isGrounded = true;
