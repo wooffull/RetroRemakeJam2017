@@ -21,6 +21,7 @@ public class ReapetteAI : MonoBehaviour {
 	private float yTargetTop;
 	private float yTargetBot;
 	private float ySeekSlice;
+	private float ySeekSliceBot;
 	private float yVelMax;
 	private float xVelMax;
 	private float xTargetForce;
@@ -37,13 +38,25 @@ public class ReapetteAI : MonoBehaviour {
 	private bool seekingPit;
 	private bool enteredScreen;
 	private bool soughtOnce;
+	private bool xSoughtOnce;
+	private bool ySoughtOnce;
+	private float timeSinceXMet;
+	private float timeSinceYMet;
+	private bool xTargetMet;
+	private bool yTargetMet;
+	private float height;
 	// Use this for initialization
 	void Start () {
+		
+		timeSinceXMet = 0;
+		timeSinceYMet = 0;
 		// Has seekZone collider hit player? (Broad phase seek)
 		seeking = false;
 		// Am I on my final descent, attempting to attack player? (Narrow phase seek)
 		seekingPit = false;
 		soughtOnce = false;
+		xSoughtOnce = false;
+		ySoughtOnce = false;
 		player = GameObject.Find ("Player");
 		body = GetComponent<Rigidbody2D> ();
 		// How many times have I reached left/right side of screen?
@@ -75,14 +88,16 @@ public class ReapetteAI : MonoBehaviour {
 		// Lower offset from bottom of current screen position (used in narrow phase seek)
 		ySeekOffset = -100f;
 		// Screen height divisor
-		ySeekSlice = 3;
+		ySeekSlice = 1.5f;
+		ySeekSliceBot = 10f;
+
 		// Init yTarget to yTargetBot, causes a swoop in from top of screen
 		yTarget = yTargetTop;
 
 		xTarget = transform.position.x;
 
 		// Max horizontal accel
-		xAccMax = 7f;
+		xAccMax = 9f;
 		// Min horiz accel
 		xAccMin = 0.5f;
 		// Max horiz velocity
@@ -90,16 +105,20 @@ public class ReapetteAI : MonoBehaviour {
 		// Screen width divisor (for approximate horizontal bounds to init narrow phase seek)
 		xSeekSlice = 6;
 
+		height = viewportTop - viewportBot;
+
+		xTargetMet = false;
+		yTargetMet = false;
 
 		// Determine which way I should face given my position and player's position
 		// Set horizontal target in my direction
-//		if (player.transform.position.x - transform.position.x >= 0) {
-//			dir = 1;
+		if (player.transform.position.x - transform.position.x >= 0) {
+			dir = 1;
 //			xTarget = xTargetRight;
-//		} else {
-//			dir = -1;
+		} else {
+			dir = -1;
 //			xTarget = xTargetLeft;
-//		}
+		}
 		// Set enteredScreen bool to determine when to lock me to an upper screen boundary
 		if (transform.position.y < viewportTop) {
 			enteredScreen = true;
@@ -114,6 +133,7 @@ public class ReapetteAI : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
+
 		// BROAD PHASE SEEK
 		if (seeking) {
 			// X target is now player
@@ -140,12 +160,11 @@ public class ReapetteAI : MonoBehaviour {
 		// ---------------------------------------------------
 
 		// Set new Y targets and screen Y max/min world points
-		yTargetTop = player.transform.position.y + (Screen.height / ySeekSlice);
-		yTargetBot = player.transform.position.y - (Screen.height / ySeekSlice);
+
 		viewportTop = camera.ViewportToWorldPoint(new Vector3(0, 1f, transform.position.z)).y;
 		viewportBot = camera.ViewportToWorldPoint(new Vector3(0, 0f, transform.position.z)).y;
 
-		// Set the seek force to target
+//		// Set the seek force to target
 		yTargetForce = (yTarget - transform.position.y) * 15;
 		// Limit the seek force min/max
 		if (Mathf.Abs(yTargetForce) > yAccMax) {
@@ -173,22 +192,12 @@ public class ReapetteAI : MonoBehaviour {
 			transform.position = new Vector3 (transform.position.x, viewportTop);
 		}
 
-		// If not in broad phase seek and below the bottom wander target, set target to top
-		if (transform.position.y < yTarget) {
-			if (!seeking) {
-				yTarget = yTargetTop;
-			}
-			// else if above the top wander target, set target to bottom
-		} else if (transform.position.y > yTarget) {
-			if (!seeking) {
-				yTarget = yTargetBot;
-			}
-		}
+
 
 		// X VALUE MANIPULATION --------------------------------
 		// -----------------------------------------------------
 
-		// Set X seek force
+//		// Set X seek force
 		xTargetForce = (xTarget - transform.position.x) * 10;
 		// Limit X acc
 		if (Mathf.Abs(xTargetForce) > xAccMax) {
@@ -207,33 +216,7 @@ public class ReapetteAI : MonoBehaviour {
 			body.AddForce (new Vector2(xval, 0));
 		}
 
-		if (!enteredScreen) {
-			if (soughtOnce) {
-				// If I am at right target and moving right, set target to left, change direction
-				if (transform.position.x >= xTarget && dir == 1) {
-					ChangeDir (-1);
-					if (!seeking) {
-						xTarget = xTargetLeft;
-					}
-					// If I am at right target and moving left, set target to right, change direction
-				} else if (transform.position.x <= xTarget && dir == -1) {
-					ChangeDir (1);
-					if (!seeking) {
-						xTarget = xTargetRight;
-					}
-				}
-			} else {
-				if (dir == null) {
-					if (player.transform.position.x - transform.position.x >= 0) {
-						dir = 1;
-					} else {
-						dir = -1;
-					}
-				}
-			}
-		} else {
-			xTarget = transform.position.x;
-		}
+
 		// Limit me from moving right/left off screen
 		if (transform.position.x > viewportRight) {
 			transform.position = new Vector3(viewportRight, transform.position.y);
@@ -241,6 +224,88 @@ public class ReapetteAI : MonoBehaviour {
 		if (transform.position.x < viewportLeft) {
 			transform.position = new Vector3(viewportLeft, transform.position.y);
 		}
+
+		if (enteredScreen && !xSoughtOnce && !ySoughtOnce) {
+			xTarget = player.transform.position.x;
+			yTarget = player.transform.position.y;
+			yTargetBot = player.transform.position.y - (height / ySeekSliceBot);
+			yTargetTop = player.transform.position.y + (height / ySeekSlice);
+		}
+
+		if (!seeking) {
+			if (!xSoughtOnce) {
+				if (dir == 1 && transform.position.x > player.transform.position.x) {
+					xSoughtOnce = true;
+					xTarget = xTargetRight;
+				} else if (dir == -1 && transform.position.x < player.transform.position.x) {
+					xSoughtOnce = true;
+					xTarget = xTargetLeft;
+				}
+			}
+			if (!ySoughtOnce) {
+				if (transform.position.y < yTarget) {
+					yTarget = yTargetBot;
+					ySoughtOnce = true;
+				}
+			}
+			
+			// both sought first
+			if (xSoughtOnce && ySoughtOnce) {
+				// reset lower target each frame if needed
+				if (yTarget == yTargetBot && yTargetBot < (player.transform.position.y - (height / ySeekSlice))) {
+					yTarget = yTargetBot = player.transform.position.y - (height / ySeekSliceBot);
+				}
+
+				// if seeking top and reached, but still lower than player, RESET top target before cycling phase
+				if (yTarget == yTargetTop && (transform.position.y >= yTargetTop && yTargetTop <= player.transform.position.y || player.transform.position.y >= yTargetTop)) {
+					yTarget = yTargetTop = player.transform.position.y + (height / ySeekSlice);
+				}
+
+				// if seeking bottom and reached, switch to top
+				if (transform.position.y <= yTargetBot && yTarget == yTargetBot) {
+					Debug.Log ("Bot met");
+					yTargetTop = player.transform.position.y + (height / ySeekSlice);
+					yTarget = yTargetTop;
+				}
+				// if seeking top and reached, switch to bottom
+				if (transform.position.y >= yTarget && yTarget == yTargetTop) {
+					yTarget = yTargetBot;
+					yTargetMet = true;
+				}
+
+				// reached top target, set new x target
+				if (yTargetMet) {
+					if (transform.position.x <= xTargetLeft && xTarget == xTargetLeft) {
+						xTarget = xTargetRight;
+						yTargetMet = false;
+						ChangeDir (1);
+					}
+					if (transform.position.x >= xTargetRight && xTarget == xTargetRight) {
+						xTarget = xTargetLeft;
+						yTargetMet = false;
+						ChangeDir (1);
+					}
+				}
+			}
+
+			// if reached x target
+			if (transform.position.x <= xTargetLeft && xTarget == xTargetLeft) {
+				xTargetMet = true;
+			}
+			if (transform.position.x >= xTargetRight && xTarget == xTargetRight) {
+				xTargetMet = true;
+			}
+
+
+			// force to seek top if hit bottom of screen
+			if (!seeking && transform.position.y < viewportBot) {
+				yTarget = yTargetTop;
+				transform.position = new Vector3(transform.position.x, viewportBot);
+			}
+		}
+//		yTargetTop = player.transform.position.y + (height / ySeekSlice);
+//		yTargetBot = player.transform.position.y - (height / ySeekSlice);
+
 	}
 
 	// Change the direction I am facing
@@ -251,7 +316,7 @@ public class ReapetteAI : MonoBehaviour {
 
 	// MonoeyeSeekCollider calls me
 	// Sets broad phase seek
-	void OnMonoeyeSeek () {
+	void OnEnemySeek () {
 		if (timesFlipped >= timesFlippedMax) {
 			seeking = true;
 		}
