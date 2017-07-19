@@ -13,6 +13,7 @@ public class DestroyWhenBelowCamera : MonoBehaviour
     private new Collider2D collider;
 	private Vector3 viewportBottomLeft;
     private Vector3 viewportTopRight;
+    private AudioManager audioManager;
 
     // Use this for initialization
     void Start ()
@@ -21,7 +22,8 @@ public class DestroyWhenBelowCamera : MonoBehaviour
         viewportBottomLeft = camera.ViewportToWorldPoint(new Vector3(0, 0, transform.position.z));
         // viewportTopRight = camera.ViewportToWorldPoint(new Vector3(1, 1, transform.position.z));
         collider = GetComponent<Collider2D>();
-	    }
+        audioManager = GameObject.Find("Audio").GetComponent<AudioManager>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -33,8 +35,14 @@ public class DestroyWhenBelowCamera : MonoBehaviour
         {
             Destroy(gameObject);
 
-			if (gameObject.tag == "Player")
+            if (gameObject.tag == "Player")
             {
+                Stats playerStats = gameObject.GetComponent<Stats>();
+
+                if (playerStats.health > 0)
+                {
+                    audioManager.PlayPlayerDeathSound();
+                }
                 SceneManager.LoadScene("GameOverScene");
             }
         }

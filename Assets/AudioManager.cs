@@ -11,6 +11,8 @@ public class AudioManager : MonoBehaviour
     public AudioClip jumpSfx;
     public AudioClip shootArrowSfx;
     public AudioClip reaperSpotsPlayerSfx;
+    public AudioClip playerStartSfx;
+    public AudioClip playerDeathSfx;
 
     public float denySfxThrottleTime = 0.25f;
 
@@ -74,6 +76,20 @@ public class AudioManager : MonoBehaviour
     public void PlayShootArrowSound()
     {
         Play(shootArrowSfx);
+    }
+
+    public void PlayPlayerStartSound()
+    {
+        mainBgm = gameObject.GetComponent<AudioSource>();
+        mainBgm.Play();
+        mainBgm.volume = 1f;
+        Play(playerStartSfx);
+    }
+
+    public void PlayPlayerDeathSound()
+    {
+        mainBgm.Stop();
+        Play(playerDeathSfx);
     }
 
     public void PlayReaperSpotsPlayerSound()
