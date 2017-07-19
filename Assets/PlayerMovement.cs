@@ -87,10 +87,6 @@ public class PlayerMovement : MonoBehaviour
             isUp = false;
             collider.size = new Vector2(1, 1.92f * (2f / 3f));
             collider.offset = new Vector2(0, 0.95f * (2f / 3f));
-            if(isGrounded) // Prevents Pit from jumping while crouching on the ground
-            {
-                canJump = false;
-            }
             //canMove = true;
         }
         else if (verticalInput > 0) // Pit aims upward

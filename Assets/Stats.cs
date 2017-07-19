@@ -63,6 +63,7 @@ public class Stats : MonoBehaviour {
     {
         collectible = Instantiate(moneyPrefab, Vector3.zero, Quaternion.identity) as GameObject;
         collectible.transform.position = gameObject.transform.position;
+        collectible.transform.position += new Vector3(0, 0, -1); // Spawn in front of blocks
         collectible.name = "Money_" + gameObject.name;
     }
 
@@ -71,6 +72,7 @@ public class Stats : MonoBehaviour {
     {
         collectible = Instantiate(healthPrefab, Vector3.zero, Quaternion.identity) as GameObject;
         collectible.transform.position = gameObject.transform.position;
+        collectible.transform.position += new Vector3(0, 0, -1); // Spawn in front of blocks
     }
 
 	// Update is called once per frame
@@ -81,6 +83,8 @@ public class Stats : MonoBehaviour {
         if (isPlayer && health <= 0)
         {
             Destroy(gameObject.GetComponent<PlayerMovement>());
+            Destroy(gameObject.GetComponent<PlayerAnimations>());
+            Destroy(gameObject.GetComponent<Shoot>());
             Destroy(rigidBody);
             if (!isPlayerDead)
             {

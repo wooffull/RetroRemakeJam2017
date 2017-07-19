@@ -16,6 +16,7 @@ public class Arrow : MonoBehaviour {
     [HideInInspector]
     public int damage = 1;
 
+    private bool arrowDisabled = false;
     private float lifeTime = 0.0f;
     private AudioManager audioManager;
 
@@ -40,8 +41,14 @@ public class Arrow : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D c)
     {
+        // Ensures the arrow doesn't affect enemies through bocks
+        if(c.gameObject.tag == "Block")
+        {
+            arrowDisabled = true;
+        }
+
         // Damage the enemy and play a sound
-        if (c.gameObject.tag == "Enemy")
+        if (c.gameObject.tag == "Enemy" && !arrowDisabled)
         {
             Stats stats = c.gameObject.GetComponent<Stats>();
             stats.health -= damage;

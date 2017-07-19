@@ -45,6 +45,7 @@ public class ScreenWrap : MonoBehaviour {
             ghostPlayers[i] = new GameObject();
             sr = ghostPlayers[i].AddComponent<SpriteRenderer>();
             sr.sprite = gameObject.GetComponent<SpriteRenderer>().sprite;
+            sr.transform.rotation = gameObject.transform.rotation;
         }
     }
 

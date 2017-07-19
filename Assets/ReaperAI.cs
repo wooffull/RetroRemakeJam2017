@@ -18,6 +18,7 @@ public class ReaperAI : MonoBehaviour {
     private bool isTurning = false;
     private bool isTurningDisabled = false;
     private bool playerDetected = false;
+    private bool playerTargeted = false;
     private float currentTime;
     private float startTime;
     private float startDetectTime;
@@ -157,11 +158,16 @@ public class ReaperAI : MonoBehaviour {
                 if(playerDetected)
                 {
                     transform.position += new Vector3(chargeSpeed, 0, 0);
-                    TargetPlayer();
+                    if(!playerTargeted)
+                    {
+                        TargetPlayer();
+                        playerTargeted = true;
+                    }
                 }
                 else
                 {
                     transform.position += new Vector3(speed, 0, 0);
+                    playerTargeted = false;
                 }
             }
         }
