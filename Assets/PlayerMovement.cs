@@ -18,10 +18,13 @@ public class PlayerMovement : MonoBehaviour
 
     private bool canJump = false;
     private bool isGrounded = false;
+    private bool isTouchingWall = false;
     //private bool canMove = true;
+    private int layerIndex;
     private float jumpTimer = 0;
     private HashSet<GameObject> collidedGroundObjects;
     private AudioManager audioManager;
+    private RaycastHit2D hit;
 
     // Use this for initialization
     void Start () {
@@ -29,6 +32,7 @@ public class PlayerMovement : MonoBehaviour
         collider = gameObject.GetComponent<BoxCollider2D>();
         collidedGroundObjects = new HashSet<GameObject>();
         audioManager = GameObject.Find("Audio").GetComponent<AudioManager>();
+        layerIndex = 1 << LayerMask.NameToLayer("Block");
     }
 
     void OnCollisionEnter2D(Collision2D c)
@@ -109,6 +113,34 @@ public class PlayerMovement : MonoBehaviour
         // Reset movement for this tick
         displacement = Vector2.zero;
 
+        // Shoots the raycast in the proper direction
+        if (isLeft)
+        {
+            hit = Physics2D.Raycast(transform.position, Vector3.left, 0.64f, layerIndex);
+        }
+        else
+        {
+            hit = Physics2D.Raycast(transform.position, Vector3.right, 0.64f, layerIndex);
+        }
+
+        // Hits a block and stops the player
+        if (hit.collider != null && hit.collider.tag == "Block")
+        {
+            // Makes sure the player can still collide with the door to finish the game
+            if(hit.collider.name == "FinishDoor")
+            {
+                isTouchingWall = false;
+            }
+            else
+            {
+                isTouchingWall = true;
+            }
+        }
+        else
+        {
+            isTouchingWall = false;
+        }
+
         UpdateMovement();
         UpdateJump();
 
@@ -130,7 +162,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Add movement from walking around
-        if(!((isUp || isCrouch) && isGrounded)) // Prevents Pit from moving along the ground while aiming up or crouching
+        if(!((isUp || isCrouch) && isGrounded) && !isTouchingWall) // Prevents Pit from moving along the ground while aiming up or crouching or touching a wall
         {
             displacement.x += walkDirection * walkSpeed * Time.deltaTime;
         }

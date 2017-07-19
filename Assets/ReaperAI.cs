@@ -65,6 +65,18 @@ public class ReaperAI : MonoBehaviour {
         audioManager = GameObject.Find("Audio").GetComponent<AudioManager>();
     }
 
+    // Method for making the sprites face left
+    void LeftSprites()
+    {
+        transform.localScale = new Vector3(-1, 1, 1);
+    }
+
+    // Method for making the sprites face right
+    void RightSprites()
+    {
+        transform.localScale = new Vector3(1, 1, 1);
+    }
+
     // Method for reversing the direction of the Reaper
     void ReverseDirection()
     {
@@ -124,6 +136,16 @@ public class ReaperAI : MonoBehaviour {
 		screenTop = camera.ViewportToWorldPoint (new Vector3(0, 1f, transform.position.z)).y;
         currentTime = Time.time;
         UpdatePoints();
+
+        // Determines direction the sprites will face
+        if (isLeft)
+        {
+            LeftSprites();
+        }
+        else
+        {
+            RightSprites();
+        }
 
         // Reaper pauses when hit
         if (enemyStats.health < currentEnemyHealth && !playerDetected)
