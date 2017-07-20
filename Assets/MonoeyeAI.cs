@@ -102,7 +102,15 @@ public class MonoeyeAI : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+        // Swaps sprite in the correct direction
+        if(xTarget == xTargetLeft)
+        {
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
 	}
 
 	void FixedUpdate () {
