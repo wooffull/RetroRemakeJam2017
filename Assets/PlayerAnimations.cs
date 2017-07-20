@@ -51,11 +51,13 @@ public class PlayerAnimations : MonoBehaviour {
     private Sprite[] activeShootAnimation;
     private SpriteRenderer spriteRenderer;
     private PlayerMovement playerMovement;
+    private Stats playerStats;
 
     // Use this for initialization
     void Start () {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         playerMovement = gameObject.GetComponent<PlayerMovement>();
+        playerStats = gameObject.GetComponent<Stats>();
         playerShoot = gameObject.GetComponent<Shoot>();
         walkSprites = new Sprite[4];
         jumpSprites = new Sprite[4];
@@ -100,6 +102,13 @@ public class PlayerAnimations : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        // Make Pit crouch if he's dead
+        if (playerStats.health == 0)
+        {
+            spriteRenderer.sprite = playerCrouch;
+            return;
+        }
+
         currentFrame = Time.frameCount;
 
         // Animation for shooting

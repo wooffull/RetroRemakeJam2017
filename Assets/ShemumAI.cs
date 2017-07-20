@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ShemumAI : MonoBehaviour {
 
-    public float speed = 0.05f;
+    public float speed = 2 * 1.28f;
     public float waitTime = 1;
     public float pauseOnFallHeight = 3; // Measured in the scale of the block
 
@@ -177,7 +177,7 @@ public class ShemumAI : MonoBehaviour {
             }
             else
             {
-                transform.position += new Vector3(currentSpeed, 0, 0);
+                transform.position += new Vector3(currentSpeed * Time.deltaTime, 0, 0);
             }
         }
         else // Shemum is paused at a wall or just fell

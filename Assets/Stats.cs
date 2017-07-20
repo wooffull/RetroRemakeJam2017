@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Stats : MonoBehaviour {
 
+    public float playerDropSpeed = 2 * 1.28f;
+    public float playerDropDelay = 0.5f;
     public int maxHealth = 50;
     public int money = 0;
     public int damage = 10;
@@ -92,7 +94,7 @@ public class Stats : MonoBehaviour {
                 isPlayerDead = true;
             }
 
-            if (currentTime > (startTime + 1)) // Stays still for 1 second before falling
+            if (currentTime > (startTime + playerDropDelay)) // Stays still for a delay before falling
             {
                 if (!hasDied)
                 {
@@ -100,7 +102,7 @@ public class Stats : MonoBehaviour {
                 }
 
                 hasDied = true;
-                transform.position += Vector3.down * 0.1f;
+                transform.position += Vector3.down * playerDropSpeed * Time.deltaTime;
             }
         }
         else if(health <= 0) // If it is not the player, the enemy dies
