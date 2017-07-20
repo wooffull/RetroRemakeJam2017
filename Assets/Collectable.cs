@@ -8,7 +8,7 @@ public class Collectable : MonoBehaviour {
     public int moneyIncrease = 0;
     public float duration = 10;
     public float warningDuration = 3;
-    public float warningChangeTime = 0.25f;
+    public float warningChangeTime = 0.1f;
     public bool lastForever = false;
 
     private float currentTime;

@@ -109,7 +109,7 @@ public class Stats : MonoBehaviour {
             if(playerStats.health != playerStats.maxHealth)
             {
                 float num = Random.value;
-                if(num < 0.5)
+                if(num < 0.25)
                 {
                     SpawnHealth();
                 }

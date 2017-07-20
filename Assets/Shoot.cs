@@ -50,7 +50,7 @@ public class Shoot : MonoBehaviour {
             // Spawns upward
             arrow.transform.position = new Vector3(
                 player.transform.position.x,
-                player.transform.position.y + 2.24f,
+                player.transform.position.y + 2f,
                 player.transform.position.z
                 );
             arrow.transform.rotation = new Quaternion(45, 45, 0, 0);
@@ -60,8 +60,8 @@ public class Shoot : MonoBehaviour {
         {
             // Spawns to the left
             arrow.transform.position = new Vector3(
-                player.transform.position.x - 1.28f,
-                player.transform.position.y + .96f,
+                player.transform.position.x - 1f,
+                player.transform.position.y + 1f,
                 player.transform.position.z);
             arrow.transform.localScale = new Vector3(-1, 1, 1);
             arrowComponent.direction = Vector3.left;
@@ -70,8 +70,8 @@ public class Shoot : MonoBehaviour {
         {
             // Spawns to the right
             arrow.transform.position = new Vector3(
-                player.transform.position.x + 1.28f,
-                player.transform.position.y + .96f,
+                player.transform.position.x + 1f,
+                player.transform.position.y + 1f,
                 player.transform.position.z);
             arrowComponent.direction = Vector3.right;
         }

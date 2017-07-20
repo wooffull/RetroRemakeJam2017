@@ -26,6 +26,13 @@ public class PlayerMovement : MonoBehaviour
     private AudioManager audioManager;
     private RaycastHit2D hit;
 
+    private Vector3 startPosition;
+
+    void Awake()
+    {
+        startPosition = transform.position;
+    }
+
     // Use this for initialization
     void Start () {
         rigidBody = gameObject.GetComponent<Rigidbody2D>();
@@ -33,6 +40,11 @@ public class PlayerMovement : MonoBehaviour
         collidedGroundObjects = new HashSet<GameObject>();
         audioManager = GameObject.Find("Audio").GetComponent<AudioManager>();
         layerIndex = 1 << LayerMask.NameToLayer("Block");
+
+        // Reset player on Start so it doesn't fly through walls at the beginning of the scene
+        displacement = Vector3.zero;
+        rigidBody.velocity *= 0;
+        transform.position = startPosition;
     }
 
     void OnCollisionEnter2D(Collision2D c)
